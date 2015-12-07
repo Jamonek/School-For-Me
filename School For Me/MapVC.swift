@@ -33,7 +33,8 @@ class MapVC: UIViewController, MKMapViewDelegate {
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.startUpdatingLocation()
             
-            self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true);
+            self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
+             mapView.showsUserLocation = true // Show current location of user
             
         } else {
             let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: UIAlertControllerStyle.Alert)
@@ -42,7 +43,6 @@ class MapVC: UIViewController, MKMapViewDelegate {
             return
         }
         
-        mapView.showsUserLocation = true // Show current location of user
         mapView.mapType = MKMapType.Standard // Standard look of the map
         mapView.zoomEnabled = true // Allow the user to zoom on the map via finger gestures
         
