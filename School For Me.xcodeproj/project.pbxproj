@@ -16,6 +16,7 @@
 		64B8F2751C1515CB005BC4A9 /* School_For_MeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B8F2741C1515CB005BC4A9 /* School_For_MeTests.swift */; };
 		64B8F2801C1515CC005BC4A9 /* School_For_MeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B8F27F1C1515CC005BC4A9 /* School_For_MeUITests.swift */; };
 		64C6B26A1C1615E000ADE887 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 64C6B2691C1615E000ADE887 /* FontAwesome.otf */; };
+		64C6B26E1C16274600ADE887 /* MapVCExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64C6B26D1C16274600ADE887 /* MapVCExt.swift */; };
 		6CEFC51284F351DFFF9C4189 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85D0BCDB61AF1F90A39AAE6F /* Pods.framework */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,7 @@
 		64B8F27F1C1515CC005BC4A9 /* School_For_MeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = School_For_MeUITests.swift; sourceTree = "<group>"; };
 		64B8F2811C1515CC005BC4A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		64C6B2691C1615E000ADE887 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
+		64C6B26D1C16274600ADE887 /* MapVCExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapVCExt.swift; sourceTree = "<group>"; };
 		85D0BCDB61AF1F90A39AAE6F /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -108,9 +110,10 @@
 		64B8F25B1C1515CB005BC4A9 /* School For Me */ = {
 			isa = PBXGroup;
 			children = (
+				64C6B26C1C16271000ADE887 /* Extensions */,
+				64C6B26B1C16270900ADE887 /* Controllers */,
 				64C6B2671C16143100ADE887 /* Fonts */,
 				64B8F25C1C1515CB005BC4A9 /* AppDelegate.swift */,
-				64B8F25E1C1515CB005BC4A9 /* MapVC.swift */,
 				64B8F2601C1515CB005BC4A9 /* Main.storyboard */,
 				64B8F2661C1515CB005BC4A9 /* Assets.xcassets */,
 				64B8F2681C1515CB005BC4A9 /* LaunchScreen.storyboard */,
@@ -144,6 +147,22 @@
 				64C6B2691C1615E000ADE887 /* FontAwesome.otf */,
 			);
 			name = Fonts;
+			sourceTree = "<group>";
+		};
+		64C6B26B1C16270900ADE887 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				64B8F25E1C1515CB005BC4A9 /* MapVC.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		64C6B26C1C16271000ADE887 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				64C6B26D1C16274600ADE887 /* MapVCExt.swift */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		E3A65F42F961358326FF6B52 /* Frameworks */ = {
@@ -347,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64B8F2651C1515CB005BC4A9 /* School_For_Me.xcdatamodeld in Sources */,
+				64C6B26E1C16274600ADE887 /* MapVCExt.swift in Sources */,
 				64B8F25F1C1515CB005BC4A9 /* MapVC.swift in Sources */,
 				64B8F25D1C1515CB005BC4A9 /* AppDelegate.swift in Sources */,
 			);

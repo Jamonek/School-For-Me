@@ -17,36 +17,51 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eMg-I4-URD">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="65"/>
+                                <subviews>
+                                    <searchBar contentMode="redraw" placeholder="Search for a school or location" showsCancelButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8cU-GY-bEd">
+                                        <rect key="frame" x="0.0" y="25" width="600" height="44"/>
+                                        <animations/>
+                                        <textInputTraits key="textInputTraits"/>
+                                        <scopeButtonTitles>
+                                            <string>Title</string>
+                                            <string>Title</string>
+                                        </scopeButtonTitles>
+                                    </searchBar>
+                                </subviews>
+                                <animations/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="8cU-GY-bEd" secondAttribute="trailing" id="727-Fr-G2H"/>
+                                    <constraint firstItem="8cU-GY-bEd" firstAttribute="top" secondItem="eMg-I4-URD" secondAttribute="top" constant="25" id="RtC-tG-rf5"/>
+                                    <constraint firstItem="8cU-GY-bEd" firstAttribute="leading" secondItem="eMg-I4-URD" secondAttribute="leading" id="gBu-n7-3o0"/>
+                                </constraints>
+                            </view>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Tab-em-tyn">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                                 <animations/>
                             </mapView>
-                            <searchBar contentMode="redraw" placeholder="Search for a school or location" translatesAutoresizingMaskIntoConstraints="NO" id="8cU-GY-bEd">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
-                                <animations/>
-                                <textInputTraits key="textInputTraits"/>
-                                <scopeButtonTitles>
-                                    <string>Title</string>
-                                    <string>Title</string>
-                                </scopeButtonTitles>
-                            </searchBar>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="Tab-em-tyn" secondAttribute="trailing" id="0nU-Tj-kKy"/>
-                            <constraint firstItem="8cU-GY-bEd" firstAttribute="trailing" secondItem="Tab-em-tyn" secondAttribute="trailing" id="CQn-hp-PxW"/>
-                            <constraint firstItem="8cU-GY-bEd" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="-64" id="I9r-pW-kRU"/>
-                            <constraint firstItem="Tab-em-tyn" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="OaG-1f-Bmo"/>
-                            <constraint firstItem="Tab-em-tyn" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="StS-qV-bqI"/>
-                            <constraint firstItem="8cU-GY-bEd" firstAttribute="leading" secondItem="Tab-em-tyn" secondAttribute="leading" id="Xv2-dH-jm3"/>
-                            <constraint firstItem="Tab-em-tyn" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="bvo-BX-DLx"/>
+                            <constraint firstAttribute="trailing" secondItem="eMg-I4-URD" secondAttribute="trailing" id="5LK-2M-fVl"/>
+                            <constraint firstItem="Tab-em-tyn" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="7T5-rK-XQh"/>
+                            <constraint firstItem="eMg-I4-URD" firstAttribute="trailing" secondItem="Tab-em-tyn" secondAttribute="trailing" id="Hpt-1y-Es3"/>
+                            <constraint firstItem="Tab-em-tyn" firstAttribute="leading" secondItem="eMg-I4-URD" secondAttribute="leading" id="PD8-Lp-XMA"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="eMg-I4-URD" secondAttribute="bottom" constant="535" id="bzE-83-IIF"/>
+                            <constraint firstItem="Tab-em-tyn" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" id="pyi-t1-PUm"/>
+                            <constraint firstItem="Tab-em-tyn" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="vDL-cn-Eta"/>
+                            <constraint firstItem="eMg-I4-URD" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="zc7-Bc-KcG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="a22-75-fSx"/>
                     <connections>
+                        <outlet property="MVTopConstraint" destination="vDL-cn-Eta" id="mlU-vv-5jR"/>
                         <outlet property="mapView" destination="Tab-em-tyn" id="HoG-af-XZa"/>
                         <outlet property="searchBar" destination="8cU-GY-bEd" id="B2k-X9-taT"/>
+                        <outlet property="searchView" destination="eMg-I4-URD" id="CHJ-Cf-WxA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

@@ -11,22 +11,26 @@ import FontAwesomeKit
 import MapKit
 import CoreLocation
 
-class MapVC: UIViewController, MKMapViewDelegate {
+class MapVC: UIViewController {
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var searchBar: UISearchBar!
     let locationManager = CLLocationManager()
+    @IBOutlet var searchView: UIView!
+    @IBOutlet var MVTopConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // VC Title
         self.title = "School For Me"
+        searchView.backgroundColor = UIColor.flatSkyBlueColor()
         
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: nil)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: "presentSearchView:")
         
         // Delegates
         self.mapView.delegate = self
+        self.searchBar.delegate = self
         
         if CLLocationManager.locationServicesEnabled() {
             locationManager.requestWhenInUseAuthorization()
@@ -51,7 +55,5 @@ class MapVC: UIViewController, MKMapViewDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-
-
 }
 
