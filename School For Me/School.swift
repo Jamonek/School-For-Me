@@ -32,8 +32,8 @@ class School: Object, Mappable {
     dynamic var locale = ""
     dynamic var charter = ""
     dynamic var magnet = ""
-    dynamic var lat: Double = 0.0
-    dynamic var lon: Double = 0.0
+    dynamic var lat = ""
+    dynamic var lon = ""
     
     required convenience init?(_ map: Map) {
         self.init()

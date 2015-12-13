@@ -10,6 +10,7 @@ import UIKit
 import FontAwesomeKit
 import MapKit
 import CoreLocation
+import RealmSwift
 
 class MapVC: UIViewController {
     @IBOutlet var mapView: MKMapView!
@@ -17,6 +18,7 @@ class MapVC: UIViewController {
     let locationManager = CLLocationManager()
     @IBOutlet var searchView: UIView!
     @IBOutlet var MVTopConstraint: NSLayoutConstraint!
+    let realm = try! Realm()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +52,7 @@ class MapVC: UIViewController {
         
         mapView.mapType = MKMapType.Standard // Standard look of the map
         mapView.zoomEnabled = true // Allow the user to zoom on the map via finger gestures
+        self.populate()
         
     }
 
@@ -59,7 +62,16 @@ class MapVC: UIViewController {
     
     func populate() {
         let data = realm.objects(School)
-        var annotation: MKAnnotation = MKAnnotatio
+        print("We have \(data.count) locations in the database")
+        for i in 0..<data.count {
+            let lat = Double(data[i].lat)
+            let lon = Double(data[i].lon)
+            let coordinate = CLLocationCoordinate2D(latitude: lat!, longitude: lon!)
+            let annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate)
+            self.mapView.addAnnotation(annotation)
+            print("\(data[i].school_name) has been added: Lat->\(data[i].lat) Lon->\(data[i].lon)")
+        }
+        self.mapView.showAnnotations(self.mapView.annotations, animated: true)
     }
 }
 

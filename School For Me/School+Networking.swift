@@ -31,7 +31,7 @@ extension School {
                 for dict in JSON {
                     try! realm.write {
                         let sch = School.mappedSchool(dict)
-                        realm.add(sch)
+                        realm.add(sch, update: true)
                     }
                 }
             }
