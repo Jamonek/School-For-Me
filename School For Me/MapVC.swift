@@ -39,6 +39,7 @@ class MapVC: UIViewController {
             
             self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
              mapView.showsUserLocation = true // Show current location of user
+            School.fetchResults(withCoords: self.locationManager.location!.coordinate)
             
         } else {
             let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: UIAlertControllerStyle.Alert)
@@ -54,6 +55,11 @@ class MapVC: UIViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    func populate() {
+        let data = realm.objects(School)
+        var annotation: MKAnnotation = MKAnnotatio
     }
 }
 
