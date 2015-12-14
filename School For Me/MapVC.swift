@@ -44,13 +44,13 @@ class MapVC: UIViewController {
             School.fetchResults(withCoords: self.locationManager.location!.coordinate)
             
         } else {
-            let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Default, handler: nil))
+            let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
             return
         }
         
-        mapView.mapType = MKMapType.Standard // Standard look of the map
+        mapView.mapType = .Standard // Standard look of the map
         mapView.zoomEnabled = true // Allow the user to zoom on the map via finger gestures
         self.populate()
         

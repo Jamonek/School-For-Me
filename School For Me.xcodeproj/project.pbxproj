@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6417DFA01C1E5AB70015F95B /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DF9F1C1E5AB70015F95B /* Search.swift */; };
+		6417DFA21C1E837A0015F95B /* SearchCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DFA11C1E837A0015F95B /* SearchCells.swift */; };
 		642DA1051C1E12C300419867 /* School.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1041C1E12C300419867 /* School.swift */; };
 		642DA1071C1E15C900419867 /* School+Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1061C1E15C900419867 /* School+Networking.swift */; };
 		642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1081C1E168900419867 /* NSObject+Extensions.swift */; };
@@ -44,6 +46,8 @@
 /* Begin PBXFileReference section */
 		294352B27875654DF60FCF33 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		45D5012A30FD0A266FD3DC8E /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		6417DF9F1C1E5AB70015F95B /* Search.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		6417DFA11C1E837A0015F95B /* SearchCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchCells.swift; sourceTree = "<group>"; };
 		642DA1041C1E12C300419867 /* School.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = School.swift; sourceTree = "<group>"; };
 		642DA1061C1E15C900419867 /* School+Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "School+Networking.swift"; sourceTree = "<group>"; };
 		642DA1081C1E168900419867 /* NSObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+Extensions.swift"; sourceTree = "<group>"; };
@@ -172,6 +176,8 @@
 			isa = PBXGroup;
 			children = (
 				64B8F25E1C1515CB005BC4A9 /* MapVC.swift */,
+				6417DF9F1C1E5AB70015F95B /* Search.swift */,
+				6417DFA11C1E837A0015F95B /* SearchCells.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -385,8 +391,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6417DFA01C1E5AB70015F95B /* Search.swift in Sources */,
 				642DA10B1C1E2C3D00419867 /* SchoolAnnotations.swift in Sources */,
 				64B8F2651C1515CB005BC4A9 /* School_For_Me.xcdatamodeld in Sources */,
+				6417DFA21C1E837A0015F95B /* SearchCells.swift in Sources */,
 				64C6B26E1C16274600ADE887 /* MapVCExt.swift in Sources */,
 				642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */,
 				64B8F25F1C1515CB005BC4A9 /* MapVC.swift in Sources */,

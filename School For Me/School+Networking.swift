@@ -13,7 +13,7 @@ import CoreLocation
 import RealmSwift
 extension School {
     
-    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 10) {
+    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50) {
         let param: [String: AnyObject] = [
             "lat": coordinate.latitude,
             "lon": coordinate.longitude,

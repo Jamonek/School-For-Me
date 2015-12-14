@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--MapVC-->
@@ -57,12 +58,99 @@
                         <outlet property="MVTopConstraint" destination="vDL-cn-Eta" id="mlU-vv-5jR"/>
                         <outlet property="mapView" destination="Tab-em-tyn" id="HoG-af-XZa"/>
                         <outlet property="searchBar" destination="8cU-GY-bEd" id="B2k-X9-taT"/>
+                        <outlet property="searchDisplayController" destination="poN-Ti-JDc" id="hFH-Vh-JYI"/>
                         <outlet property="searchView" destination="eMg-I4-URD" id="CHJ-Cf-WxA"/>
+                        <segue destination="6a1-hX-2A7" kind="presentation" identifier="searchSegue" id="5lm-9W-BFh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="poN-Ti-JDc">
+                    <connections>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="saF-xC-wF4"/>
+                        <outlet property="searchContentsController" destination="BYZ-38-t0r" id="k93-jW-hhE"/>
+                        <outlet property="searchResultsDataSource" destination="BYZ-38-t0r" id="KyW-r7-x0c"/>
+                        <outlet property="searchResultsDelegate" destination="BYZ-38-t0r" id="QBl-Wo-7uk"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="1663" y="1317"/>
+            <point key="canvasLocation" x="1684" y="1317"/>
+        </scene>
+        <!--Search-->
+        <scene sceneID="P31-YK-Oyd">
+            <objects>
+                <viewController id="DqB-04-z04" customClass="Search" customModule="School_For_Me" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="jdv-5q-WaS"/>
+                        <viewControllerLayoutGuide type="bottom" id="gr5-ym-7OP"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Wp3-g1-KTr">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" placeholder="Search for a school by name or location" translatesAutoresizingMaskIntoConstraints="NO" id="I2Q-ED-f1o">
+                                <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="68" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="aCP-dV-8hM">
+                                <rect key="frame" x="0.0" y="108" width="600" height="492"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="68" id="hds-W4-Fa5" customClass="SearchCells" customModule="School_For_Me" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="600" height="68"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hds-W4-Fa5" id="lbM-T6-QdX">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="67"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="School Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="okp-Y0-8N4">
+                                                    <rect key="frame" x="8" y="0.0" width="102" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="District" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wvc-Ht-hF2">
+                                                    <rect key="frame" x="8" y="38" width="56" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="okp-Y0-8N4" firstAttribute="top" secondItem="lbM-T6-QdX" secondAttribute="top" id="9ZE-vN-C3s"/>
+                                                <constraint firstItem="wvc-Ht-hF2" firstAttribute="leading" secondItem="okp-Y0-8N4" secondAttribute="leading" id="Q1v-lR-0zs"/>
+                                                <constraint firstItem="wvc-Ht-hF2" firstAttribute="leading" secondItem="lbM-T6-QdX" secondAttribute="leadingMargin" id="UDT-jt-0dc"/>
+                                                <constraint firstItem="wvc-Ht-hF2" firstAttribute="bottom" secondItem="lbM-T6-QdX" secondAttribute="bottomMargin" id="ls4-aC-qN7"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="schoolDistrict" destination="wvc-Ht-hF2" id="HP4-2N-TH7"/>
+                                            <outlet property="schoolName" destination="okp-Y0-8N4" id="wCX-po-wPE"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="aCP-dV-8hM" firstAttribute="bottom" secondItem="gr5-ym-7OP" secondAttribute="top" id="906-Kv-ocV"/>
+                            <constraint firstItem="I2Q-ED-f1o" firstAttribute="top" secondItem="jdv-5q-WaS" secondAttribute="bottom" id="WT6-pK-kp4"/>
+                            <constraint firstItem="aCP-dV-8hM" firstAttribute="trailing" secondItem="I2Q-ED-f1o" secondAttribute="trailing" id="bSf-QI-gCI"/>
+                            <constraint firstAttribute="trailing" secondItem="I2Q-ED-f1o" secondAttribute="trailing" id="mQI-hk-wk6"/>
+                            <constraint firstItem="aCP-dV-8hM" firstAttribute="leading" secondItem="I2Q-ED-f1o" secondAttribute="leading" id="vJ3-E8-RwA"/>
+                            <constraint firstItem="aCP-dV-8hM" firstAttribute="top" secondItem="I2Q-ED-f1o" secondAttribute="bottom" id="w6p-fG-NQH"/>
+                            <constraint firstItem="I2Q-ED-f1o" firstAttribute="leading" secondItem="Wp3-g1-KTr" secondAttribute="leading" id="xLx-Vg-RUv"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="A7n-JU-jmq"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="searchBar" destination="I2Q-ED-f1o" id="0kK-Gr-th0"/>
+                        <outlet property="tableView" destination="aCP-dV-8hM" id="HoE-Va-LLX"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5xg-pO-KC6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2496" y="2051"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="DxL-eI-sgA">
@@ -81,6 +169,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YbB-Qe-5SI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="885" y="1317"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="rSi-vf-PkU">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="6a1-hX-2A7" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Vzx-Zu-M2Z">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="DqB-04-z04" kind="relationship" relationship="rootViewController" id="pDE-xo-hto"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Z8p-3G-DKt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1684" y="2051"/>
         </scene>
     </scenes>
 </document>
