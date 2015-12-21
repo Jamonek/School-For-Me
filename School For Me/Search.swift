@@ -23,10 +23,14 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         
         // Icons from FAK
         let listIcon = FAKFontAwesome.listUlIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil)
+        let listButton = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil)
         
         let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
+        
+        let filterIcon = FAKFontAwesome.filterIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
+        let filterButton = UIBarButtonItem(image: filterIcon, style: .Plain, target: self, action: "presentFilterOptions:")
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon, style: .Plain, target: self, action: "dismissView:")
+        self.navigationItem.rightBarButtonItems = [listButton, filterButton]
         
         self.searchBar.delegate = self
         self.tableView.emptyDataSetDelegate = self
@@ -116,5 +120,12 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
             filteredResults.append(result)
         }
         self.tableView.reloadData()
+    }
+    
+    func presentFilterOptions(sender: UIButton) {
+        /*let filterVC: UIViewController = FilterVC()
+        filterVC.modalPresentationStyle = .Popover
+        filterVC.popoverPresentationController?.sourceView = filterButton
+        self.presentViewController(filterVC, animated: true, completion: nil)*/
     }
 }

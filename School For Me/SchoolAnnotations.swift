@@ -10,10 +10,16 @@ import MapKit
 
 class SchoolAnnotation: NSObject, MKAnnotation {
     var title: String?
-    let district: String
+    var district: String!
     let coordinate: CLLocationCoordinate2D
     var subtitle: String? {
         return district
+    }
+    
+    override init() {
+        self.title = ""
+        self.district = ""
+        self.coordinate = CLLocationCoordinate2D()
     }
     
     init(title: String, district: String, coordinate: CLLocationCoordinate2D) {

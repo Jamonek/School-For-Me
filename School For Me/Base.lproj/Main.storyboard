@@ -60,7 +60,7 @@
                         <outlet property="searchBar" destination="8cU-GY-bEd" id="B2k-X9-taT"/>
                         <outlet property="searchDisplayController" destination="poN-Ti-JDc" id="hFH-Vh-JYI"/>
                         <outlet property="searchView" destination="eMg-I4-URD" id="CHJ-Cf-WxA"/>
-                        <segue destination="6a1-hX-2A7" kind="presentation" identifier="searchSegue" id="5lm-9W-BFh"/>
+                        <segue destination="6a1-hX-2A7" kind="show" identifier="searchSegue" id="5lm-9W-BFh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -169,6 +169,42 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YbB-Qe-5SI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="885" y="1317"/>
+        </scene>
+        <!--Filter View-->
+        <scene sceneID="7Lm-7L-WgG">
+            <objects>
+                <viewController storyboardIdentifier="filterVC" title="Filter View" id="ZLa-hP-psT" customClass="FilterVC" customModule="School_For_Me" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="OMc-Ze-6Kz"/>
+                        <viewControllerLayoutGuide type="bottom" id="bRV-cr-ppG"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="BHX-JS-zfk">
+                        <rect key="frame" x="0.0" y="0.0" width="250" height="200"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QqL-A4-b5k">
+                                <rect key="frame" x="20" y="0.0" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="oBf-aR-6aQ"/>
+                                </constraints>
+                                <state key="normal" title="Close"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="QqL-A4-b5k" firstAttribute="leading" secondItem="BHX-JS-zfk" secondAttribute="leadingMargin" constant="4" id="dK4-Mn-KRv"/>
+                            <constraint firstItem="QqL-A4-b5k" firstAttribute="top" secondItem="BHX-JS-zfk" secondAttribute="top" id="eQC-FY-hNA"/>
+                        </constraints>
+                    </view>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="250" height="200"/>
+                    <connections>
+                        <outlet property="closeButton" destination="QqL-A4-b5k" id="KNm-Pk-uVC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eno-8p-otx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2423" y="2671"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="rSi-vf-PkU">
