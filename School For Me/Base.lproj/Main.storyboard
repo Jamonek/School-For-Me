@@ -60,7 +60,7 @@
                         <outlet property="searchBar" destination="8cU-GY-bEd" id="B2k-X9-taT"/>
                         <outlet property="searchDisplayController" destination="poN-Ti-JDc" id="hFH-Vh-JYI"/>
                         <outlet property="searchView" destination="eMg-I4-URD" id="CHJ-Cf-WxA"/>
-                        <segue destination="6a1-hX-2A7" kind="show" identifier="searchSegue" id="5lm-9W-BFh"/>
+                        <segue destination="DqB-04-z04" kind="show" identifier="searchSegue" id="KlE-ip-gn8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -209,7 +209,7 @@
         <!--Navigation Controller-->
         <scene sceneID="rSi-vf-PkU">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="6a1-hX-2A7" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="searchNavController" automaticallyAdjustsScrollViewInsets="NO" id="6a1-hX-2A7" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Vzx-Zu-M2Z">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -225,4 +225,7 @@
             <point key="canvasLocation" x="1684" y="2051"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="pDE-xo-hto"/>
+    </inferredMetricsTieBreakers>
 </document>

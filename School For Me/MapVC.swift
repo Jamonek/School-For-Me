@@ -11,6 +11,8 @@ import FontAwesomeKit
 import MapKit
 import CoreLocation
 import RealmSwift
+import SVProgressHUD
+import Async
 
 class MapVC: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapView: MKMapView!
@@ -18,7 +20,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     var locationManager : CLLocationManager!
     @IBOutlet var searchView: UIView!
     @IBOutlet var MVTopConstraint: NSLayoutConstraint!
-    let realm = try! Realm()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,12 +40,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             locationManager.delegate = self
             // Request users location permission
             locationManager.requestWhenInUseAuthorization()
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
             self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
             mapView.showsUserLocation = true // Show current location of user
-            //School.fetchResults(withCoords: self.locationManager.location!.coordinate)
-            //self.populate()
         } else {
             let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
@@ -63,9 +62,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         if onBoard && School.total() > 0 {
             // load local db
             self.populate()
+            
         }
     }
     
+    // Better solution coming soon.. temporary
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let onBoard : Bool = SFMData.objectForKey("onBoard") as? Bool else {
             print("onBoard not set.. returning nil")
@@ -86,30 +87,36 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         super.didReceiveMemoryWarning()
     }
     
+    
+    // This can be modified using Notifications
     func populate() {
-        let data = realm.objects(School)
-        print("We have \(data.count) locations in the database")
-        
-        if data.count < 1 {
-            // set onBoard to false.. exit and retry
-            SFMData.setBool(false, forKey: "onBoard")
-            return
-        }
-        var annotation = SchoolAnnotation()
-        
-        for i in 0..<data.count {
-            let lat = Double(data[i].lat)
-            let lon = Double(data[i].lon)
-            let coordinate = CLLocationCoordinate2D(latitude: lat!, longitude: lon!)
-            annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate)
-            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
-                self.mapView.addAnnotation(annotation)
-                dispatch_async(dispatch_get_main_queue()) {
-                    print("\(data[i].school_name) has been added: Lat->\(data[i].lat) Lon->\(data[i].lon)")
-                }
+        SVProgressHUD.showWithStatus("Loading Maps")
+        Async.background {
+            let realm = try! Realm()
+            let data = realm.objects(School)
+            print("We have \(data.count) locations in the database")
+            
+            if data.count < 1 {
+                // set onBoard to false.. exit and retry
+                SFMData.setBool(false, forKey: "onBoard")
+                return
             }
+            
+            var annotation = SchoolAnnotation()
+            var locArray = [SchoolAnnotation]()
+            
+            for i in 0..<data.count {
+                let lat = Double(data[i].lat)
+                let lon = Double(data[i].lon)
+                let coordinate = CLLocationCoordinate2D(latitude: lat!, longitude: lon!)
+                annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate)
+               locArray.append(annotation)
+            }
+             self.mapView.addAnnotations(locArray)
+            self.mapView.showAnnotations(self.mapView.annotations, animated: true)
+            }.main {
+                SVProgressHUD.dismiss()
         }
-        self.mapView.showAnnotations(self.mapView.annotations, animated: true)
     }
 }
 

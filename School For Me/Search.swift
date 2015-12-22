@@ -25,11 +25,12 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         let listIcon = FAKFontAwesome.listUlIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         let listButton = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil)
         
-        let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        
+        //let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
+        //let closeIcon2 = FAKFontAwesome.angleLeftIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
+        let closeIcon3 = FAKFontAwesome.chevronLeftIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         let filterIcon = FAKFontAwesome.filterIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         let filterButton = UIBarButtonItem(image: filterIcon, style: .Plain, target: self, action: "presentFilterOptions:")
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon, style: .Plain, target: self, action: "dismissView:")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon3, style: .Plain, target: self, action: "dismissView:")
         self.navigationItem.rightBarButtonItems = [listButton, filterButton]
         
         self.searchBar.delegate = self
@@ -44,7 +45,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     }
     
     func dismissView(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.navigationController?.popViewControllerAnimated(true)
     }
     
     deinit {

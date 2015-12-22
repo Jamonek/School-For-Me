@@ -11,6 +11,8 @@ import Alamofire
 import AlamofireObjectMapper
 import CoreLocation
 import RealmSwift
+import Async
+
 extension School {
     
     static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: (result: Bool) -> Void) {
@@ -19,9 +21,7 @@ extension School {
             "lon": coordinate.longitude,
             "distance": distance
         ]
-        
-        let realm = try! Realm()
-        
+
         Alamofire.request(.GET, "http://api.jamonek.com/sfm/geo.php", parameters: param).responseJSON { response in
             print(response.request)
             if response.result.error != nil {
@@ -29,14 +29,17 @@ extension School {
             }
             
             if let JSON: Array = response.result.value as? Array<[String: AnyObject]> {
-                for dict in JSON {
-                    do {
-                        try realm.write {
-                            let sch = School.mappedSchool(dict)
-                            realm.add(sch, update: true)
+                Async.background {
+                    let realm = try! Realm()
+                    for dict in JSON {
+                        do {
+                            try realm.write {
+                                let sch = School.mappedSchool(dict)
+                                realm.add(sch, update: true)
+                            }
+                        } catch {
+                            print("Error adding location")
                         }
-                    } catch {
-                        print("Error adding location")
                     }
                 }
                 completion(result: true)

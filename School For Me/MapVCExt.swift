@@ -16,17 +16,14 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         //self.navigationController!.navigationBarHidden = !self.navigationController!.navigationBarHidden
         //MVTopConstraint.constant = 45
         self.performSegueWithIdentifier("searchSegue", sender: self)
-        print("Present pushed")
     }
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
         self.navigationController!.navigationBarHidden = !self.navigationController!.navigationBarHidden
         MVTopConstraint.constant = 0
-        print("Cancel pushed")
     }
     
     func dismissSearch(sender: AnyObject) {
-        print("Tapped")
         if self.searchBar.isFirstResponder() {
             self.resignFirstResponder()
         }
