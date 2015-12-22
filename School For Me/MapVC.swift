@@ -90,7 +90,9 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     
     // This can be modified using Notifications
     func populate() {
-        SVProgressHUD.showWithStatus("Loading Maps")
+        SVProgressHUD.setDefaultMaskType(.Black)
+        SVProgressHUD.showWithStatus("Loading school data..")
+        var locArray = [SchoolAnnotation]()
         Async.background {
             let realm = try! Realm()
             let data = realm.objects(School)
@@ -103,7 +105,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             }
             
             var annotation = SchoolAnnotation()
-            var locArray = [SchoolAnnotation]()
             
             for i in 0..<data.count {
                 let lat = Double(data[i].lat)
@@ -112,10 +113,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
                 annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate)
                locArray.append(annotation)
             }
-             self.mapView.addAnnotations(locArray)
+        }.main {
+            self.mapView.addAnnotations(locArray)
             self.mapView.showAnnotations(self.mapView.annotations, animated: true)
-            }.main {
-                SVProgressHUD.dismiss()
+            SVProgressHUD.dismissWithDelay(2)
         }
     }
 }
