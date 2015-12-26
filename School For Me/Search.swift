@@ -104,6 +104,11 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         return filteredResults.count
     }
     
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        // Call our resultview vc
+    }
+    
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
             filteredResults.removeAll()
@@ -124,9 +129,15 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     }
     
     func presentFilterOptions(sender: UIButton) {
-        /*let filterVC: UIViewController = FilterVC()
+        let filterVC: UIViewController = FilterVC()
         filterVC.modalPresentationStyle = .Popover
-        filterVC.popoverPresentationController?.sourceView = filterButton
-        self.presentViewController(filterVC, animated: true, completion: nil)*/
+        filterVC.preferredContentSize = CGSizeMake(400, 400)
+        
+        presentViewController(filterVC, animated: true, completion: nil)
+        
+        let popover = filterVC.popoverPresentationController
+        popover?.sourceView = sender
+        popover?.sourceRect = CGRectMake(0, 0, sender.frame.size.width, sender.frame.size.height) 
+        
     }
 }

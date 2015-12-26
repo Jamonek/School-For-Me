@@ -8,6 +8,9 @@
 
 import UIKit
 import FontAwesomeKit
+import Async
+import RealmSwift
+
 
 class FilterVC: UIViewController {
     @IBOutlet var closeButton: UIButton!
@@ -15,9 +18,6 @@ class FilterVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        closeButton.imageView?.image = closeIcon
-        closeButton.addTarget(self, action: "dismissView:", forControlEvents: .TouchUpInside)
     }
     
     override func didReceiveMemoryWarning() {
