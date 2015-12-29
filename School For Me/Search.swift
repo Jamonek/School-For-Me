@@ -11,16 +11,19 @@ import FontAwesomeKit
 import DZNEmptyDataSet
 import RealmSwift
 
-class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
+class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, UIPopoverPresentationControllerDelegate {
     @IBOutlet var searchBar: UISearchBar!
     @IBOutlet var tableView: UITableView!
     var filteredResults = [School]()
     let realm = try! Realm()
+    var searchString: String = String()
+    var schoolData: Results<School>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Search"
-        
+
+        schoolData = realm.objects(School)
         // Icons from FAK
         let listIcon = FAKFontAwesome.listUlIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         let listButton = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil)
@@ -113,31 +116,43 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         if searchText.isEmpty {
             filteredResults.removeAll()
             self.tableView.reloadData()
-            
+            self.searchString = ""
             if searchBar.isFirstResponder() {
                 searchBar.resignFirstResponder()
             }
             return
         }
         filteredResults.removeAll()
+        self.searchString = searchText
         let predicate = NSPredicate(format: "school_name CONTAINS[c] %@", searchText)
-        let results = realm.objects(School).filter(predicate)
+        let results = schoolData!.filter(predicate)
         for result in results {
             filteredResults.append(result)
         }
         self.tableView.reloadData()
     }
     
-    func presentFilterOptions(sender: UIButton) {
-        let filterVC: UIViewController = FilterVC()
+    func presentFilterOptions(sender: UIBarButtonItem) {
+        let viewFrame = (width: view.frame.width, height: view.frame.height)
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let filterVC = storyboard.instantiateViewControllerWithIdentifier("filterVC")
         filterVC.modalPresentationStyle = .Popover
-        filterVC.preferredContentSize = CGSizeMake(400, 400)
+        filterVC.preferredContentSize = CGSizeMake(viewFrame.width*0.9, viewFrame.height*0.8)
+        
+        let senderView = sender.valueForKey("view") as? UIView
+        
+        
+        let popover = filterVC.popoverPresentationController
+        popover?.delegate = self
+        popover?.sourceView = filterVC.view
+        popover?.barButtonItem = sender
+        popover?.sourceRect = (senderView?.bounds)!
         
         presentViewController(filterVC, animated: true, completion: nil)
         
-        let popover = filterVC.popoverPresentationController
-        popover?.sourceView = sender
-        popover?.sourceRect = CGRectMake(0, 0, sender.frame.size.width, sender.frame.size.height) 
-        
+    }
+    
+    func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .None
     }
 }

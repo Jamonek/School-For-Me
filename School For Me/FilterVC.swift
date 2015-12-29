@@ -14,10 +14,15 @@ import RealmSwift
 
 class FilterVC: UIViewController {
     @IBOutlet var closeButton: UIButton!
+    @IBOutlet var sortBySegmentedControl: UISegmentedControl!
+    @IBOutlet var charterSwitch: UISwitch!
+    @IBOutlet var magnetSwitch: UISwitch!
+    @IBOutlet var titleSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        closeButton.addTarget(self, action: "dismissView:", forControlEvents: .TouchUpInside)
     }
     
     override func didReceiveMemoryWarning() {
