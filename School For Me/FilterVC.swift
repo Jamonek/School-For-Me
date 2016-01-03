@@ -22,7 +22,13 @@ class FilterVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Buttons
         closeButton.addTarget(self, action: "dismissView:", forControlEvents: .TouchUpInside)
+        
+        // Switches
+        charterSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
+        magnetSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
+        titleSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
     }
     
     override func didReceiveMemoryWarning() {
@@ -31,5 +37,18 @@ class FilterVC: UIViewController {
     
     func dismissView(sender: UIButton) {
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func sendSwitchNotification(sender: UISwitch) {
+        switch sender {
+        case charterSwitch:
+            NSNotificationCenter.defaultCenter().postNotificationName("charterSwitchNotification", object: nil)
+        case magnetSwitch:
+            NSNotificationCenter.defaultCenter().postNotificationName("magnetSwitchNotification", object: nil)
+        case titleSwitch:
+            NSNotificationCenter.defaultCenter().postNotificationName("titleSwitchNotification", object: nil)
+        default:
+            break
+        }
     }
 }
