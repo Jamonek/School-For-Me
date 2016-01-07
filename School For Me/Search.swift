@@ -11,7 +11,7 @@ import FontAwesomeKit
 import DZNEmptyDataSet
 import RealmSwift
 
-class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, UIPopoverPresentationControllerDelegate {
+class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet var searchBar: UISearchBar!
     @IBOutlet var tableView: UITableView!
     var filteredResults = [School]()
@@ -45,7 +45,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         
-        self.searchBar.backgroundColor = UIColor.flatSkyBlueColor()
+        //self.searchBar.backgroundColor = UIColor.flatSkyBlueColor()
         //self.searchBar.barTintColor = UIColor.flatSkyBlueColor()
         
         // Observers
@@ -184,26 +184,6 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     }
     
     func presentFilterOptions(sender: UIBarButtonItem) {
-        let viewFrame = (width: view.frame.width, height: view.frame.height)
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let filterVC = storyboard.instantiateViewControllerWithIdentifier("filterVC")
-        filterVC.modalPresentationStyle = .Popover
-        filterVC.preferredContentSize = CGSizeMake(viewFrame.width*0.9, viewFrame.height*0.8)
-        
-        let senderView = sender.valueForKey("view") as? UIView
-        
-        
-        let popover = filterVC.popoverPresentationController
-        popover?.delegate = self
-        popover?.sourceView = filterVC.view
-        popover?.barButtonItem = sender
-        popover?.sourceRect = (senderView?.bounds)!
-        
-        presentViewController(filterVC, animated: true, completion: nil)
-        
-    }
-    
-    func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .None
+        self.performSegueWithIdentifier("filterSegue", sender: self)
     }
 }

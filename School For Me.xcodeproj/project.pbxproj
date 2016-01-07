@@ -11,6 +11,8 @@
 		6417DFA21C1E837A0015F95B /* SearchCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DFA11C1E837A0015F95B /* SearchCells.swift */; };
 		6417DFA41C20CD4A0015F95B /* FilterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DFA31C20CD4A0015F95B /* FilterVC.swift */; };
 		6417DFA81C2753C80015F95B /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DFA71C2753C80015F95B /* Globals.swift */; };
+		642137D41C3E26D1009EBB3F /* MKPinAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */; };
+		642137D61C3E4E7F009EBB3F /* StringExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642137D51C3E4E7F009EBB3F /* StringExt.swift */; };
 		642DA1051C1E12C300419867 /* School.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1041C1E12C300419867 /* School.swift */; };
 		642DA1071C1E15C900419867 /* School+Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1061C1E15C900419867 /* School+Networking.swift */; };
 		642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1081C1E168900419867 /* NSObject+Extensions.swift */; };
@@ -52,6 +54,8 @@
 		6417DFA11C1E837A0015F95B /* SearchCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchCells.swift; sourceTree = "<group>"; };
 		6417DFA31C20CD4A0015F95B /* FilterVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterVC.swift; sourceTree = "<group>"; };
 		6417DFA71C2753C80015F95B /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKPinAnnotationView.swift; sourceTree = "<group>"; };
+		642137D51C3E4E7F009EBB3F /* StringExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExt.swift; sourceTree = "<group>"; };
 		642DA1041C1E12C300419867 /* School.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = School.swift; sourceTree = "<group>"; };
 		642DA1061C1E15C900419867 /* School+Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "School+Networking.swift"; sourceTree = "<group>"; };
 		642DA1081C1E168900419867 /* NSObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+Extensions.swift"; sourceTree = "<group>"; };
@@ -209,6 +213,8 @@
 			children = (
 				64C6B26D1C16274600ADE887 /* MapVCExt.swift */,
 				642DA1081C1E168900419867 /* NSObject+Extensions.swift */,
+				642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */,
+				642137D51C3E4E7F009EBB3F /* StringExt.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -421,8 +427,10 @@
 				64C6B26E1C16274600ADE887 /* MapVCExt.swift in Sources */,
 				642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */,
 				64B8F25F1C1515CB005BC4A9 /* MapVC.swift in Sources */,
+				642137D41C3E26D1009EBB3F /* MKPinAnnotationView.swift in Sources */,
 				642DA1071C1E15C900419867 /* School+Networking.swift in Sources */,
 				6417DFA81C2753C80015F95B /* Globals.swift in Sources */,
+				642137D61C3E4E7F009EBB3F /* StringExt.swift in Sources */,
 				642DA1051C1E12C300419867 /* School.swift in Sources */,
 				6417DFA41C20CD4A0015F95B /* FilterVC.swift in Sources */,
 				64B8F25D1C1515CB005BC4A9 /* AppDelegate.swift in Sources */,

@@ -15,7 +15,7 @@ import SVProgressHUD
 import Async
 
 class MapVC: UIViewController, CLLocationManagerDelegate {
-    @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet var mapView: MKMapView!
     @IBOutlet var searchBar: UISearchBar!
     var locationManager : CLLocationManager!
     @IBOutlet var searchView: UIView!
@@ -77,7 +77,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         if !onBoard {
             SFMData.setBool(true, forKey: "onBoard")
             print("Updating results")
-            School.fetchResults(withCoords: locations.last!.coordinate) { result in
+            School.fetchResults(withCoords: locations.last!.coordinate, andDistance: 25) { result in
                 self.populate()
             }
         }
@@ -107,16 +107,17 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             var annotation = SchoolAnnotation()
             
             for i in 0..<data.count {
-                let lat = Double(data[i].lat)
-                let lon = Double(data[i].lon)
-                let coordinate = CLLocationCoordinate2D(latitude: lat!, longitude: lon!)
-                annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate)
+                let lat = (data[i].lat as NSString).doubleValue
+                let lon = (data[i].lon as NSString).doubleValue
+                let schoolID = (data[i].id as NSString).integerValue
+                let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate, schoolID: schoolID)
                locArray.append(annotation)
             }
         }.main {
             self.mapView.addAnnotations(locArray)
             self.mapView.showAnnotations(self.mapView.annotations, animated: true)
-            SVProgressHUD.dismissWithDelay(2)
+            SVProgressHUD.dismissWithDelay(1)
         }
     }
 }
