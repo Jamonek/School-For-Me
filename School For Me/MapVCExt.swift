@@ -123,28 +123,28 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         districtNameLabelContent.sizeToFit()
         specialView.addSubview(districtNameLabelContent)
         
-        gradesNameLabel.frame = CGRect(x: sX*0.22, y: sY*0.5, width: 15, height: 20)
+        gradesNameLabel.frame = CGRect(x: sX*0.22, y: sY*0.39, width: 15, height: 20)
         gradesNameLabel.sizeToFit()
         gradesNameLabel.textColor = UIColor.grayColor()
         specialView.addSubview(gradesNameLabel)
         
-        gradesLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.5, width: 15, height: 20)
+        gradesLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.39, width: 15, height: 20)
         gradesLabelContent.sizeToFit()
         specialView.addSubview(gradesLabelContent)
         
-        phoneNumberLabel.frame = CGRect(x: sX*0.22, y: sY*0.6, width: 15, height: 20)
+        phoneNumberLabel.frame = CGRect(x: sX*0.22, y: sY*0.48, width: 15, height: 20)
         phoneNumberLabel.sizeToFit()
         phoneNumberLabel.textColor = UIColor.grayColor()
         specialView.addSubview(phoneNumberLabel)
         
-        phoneNumberLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.6, width: 15, height: 20)
+        phoneNumberLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.48, width: 15, height: 20)
         phoneNumberLabelContent.sizeToFit()
         //phoneNumberLabelContent.editable = false // When I switch back to `UITextView`
         //phoneNumberLabelContent.dataDetectorTypes = .PhoneNumber
         specialView.addSubview(phoneNumberLabelContent)
         
         let seeMoreButton = UIButton()
-        seeMoreButton.frame = CGRect(x: sX*0.22, y: sY*0.8, width: 200, height: 20)
+        seeMoreButton.frame = CGRect(x: sX*0.22, y: sY*0.65, width: 200, height: 20)
         seeMoreButton.setAttributedTitle(NSAttributedString(string: "View More", font: UIFont.boldSystemFontOfSize(16), kerning: 1.0, color: UIColor.flatSkyBlueColor()), forState: .Normal)
         seeMoreButton.backgroundColor = UIColor.clearColor()
         specialView.addSubview(seeMoreButton)

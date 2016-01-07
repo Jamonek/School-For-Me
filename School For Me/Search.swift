@@ -28,7 +28,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         schoolData = realm.objects(School)
         // Icons from FAK
         let listIcon = FAKFontAwesome.listUlIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        let listButton = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil) // Removed from navigation until feature is complete
+        _ = UIBarButtonItem(image: listIcon, style: .Plain, target: self, action: nil) // Removed from navigation until feature is complete
         
         //let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         //let closeIcon2 = FAKFontAwesome.angleLeftIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
