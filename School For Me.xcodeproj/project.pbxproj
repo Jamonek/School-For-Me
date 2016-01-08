@@ -17,6 +17,7 @@
 		642DA1071C1E15C900419867 /* School+Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1061C1E15C900419867 /* School+Networking.swift */; };
 		642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1081C1E168900419867 /* NSObject+Extensions.swift */; };
 		642DA10B1C1E2C3D00419867 /* SchoolAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */; };
+		646778FB1C3F4A470060ECD6 /* UIViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646778FA1C3F4A470060ECD6 /* UIViewExt.swift */; };
 		64B8F25D1C1515CB005BC4A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B8F25C1C1515CB005BC4A9 /* AppDelegate.swift */; };
 		64B8F25F1C1515CB005BC4A9 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B8F25E1C1515CB005BC4A9 /* MapVC.swift */; };
 		64B8F2621C1515CB005BC4A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 64B8F2601C1515CB005BC4A9 /* Main.storyboard */; };
@@ -60,6 +61,7 @@
 		642DA1061C1E15C900419867 /* School+Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "School+Networking.swift"; sourceTree = "<group>"; };
 		642DA1081C1E168900419867 /* NSObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+Extensions.swift"; sourceTree = "<group>"; };
 		642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchoolAnnotations.swift; sourceTree = "<group>"; };
+		646778FA1C3F4A470060ECD6 /* UIViewExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExt.swift; sourceTree = "<group>"; };
 		64B8F2591C1515CB005BC4A9 /* School For Me.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "School For Me.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		64B8F25C1C1515CB005BC4A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64B8F25E1C1515CB005BC4A9 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				642DA1081C1E168900419867 /* NSObject+Extensions.swift */,
 				642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */,
 				642137D51C3E4E7F009EBB3F /* StringExt.swift */,
+				646778FA1C3F4A470060ECD6 /* UIViewExt.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -432,6 +435,7 @@
 				6417DFA81C2753C80015F95B /* Globals.swift in Sources */,
 				642137D61C3E4E7F009EBB3F /* StringExt.swift in Sources */,
 				642DA1051C1E12C300419867 /* School.swift in Sources */,
+				646778FB1C3F4A470060ECD6 /* UIViewExt.swift in Sources */,
 				6417DFA41C20CD4A0015F95B /* FilterVC.swift in Sources */,
 				64B8F25D1C1515CB005BC4A9 /* AppDelegate.swift in Sources */,
 			);
