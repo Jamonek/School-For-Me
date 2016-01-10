@@ -146,7 +146,8 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        // Call our resultview vc
+        Global.schoolID = (filteredResults[indexPath.row].id as NSString).integerValue
+        self.showDetailTV(nil)
     }
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {

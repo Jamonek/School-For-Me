@@ -10,3 +10,4 @@ pod 'DZNEmptyDataSet'
 pod 'EAIntroView', '~> 2.8.0'
 pod 'SVProgressHUD', :head
 pod 'AsyncSwift'
+pod 'Cartography'

@@ -152,6 +152,60 @@
             </objects>
             <point key="canvasLocation" x="2486" y="2045"/>
         </scene>
+        <!--School View-->
+        <scene sceneID="mhF-kJ-Qhf">
+            <objects>
+                <tableViewController storyboardIdentifier="detailTV" title="School View" id="Woe-wy-1ub" customClass="DetailTV" customModule="School_For_Me" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="75" sectionHeaderHeight="28" sectionFooterHeight="28" id="1ga-oi-fMJ">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="892"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="detail" rowHeight="75" id="p1H-C9-BHx" customClass="DetailTVC" customModule="School_For_Me" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="600" height="75"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="p1H-C9-BHx" id="iLd-rZ-RA4">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="74"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y8l-oM-hTq">
+                                            <rect key="frame" x="0.0" y="0.0" width="65" height="74"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AE9-dS-hRi">
+                                                    <rect key="frame" x="6" y="12" width="53" height="50"/>
+                                                </imageView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7c8-4w-bgl">
+                                            <rect key="frame" x="73" y="8" width="519" height="34"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="detailLabel" destination="7c8-4w-bgl" id="516-h0-nsx"/>
+                                    <outlet property="detailLeftImage" destination="AE9-dS-hRi" id="XC5-Cg-H1E"/>
+                                    <outlet property="detailLeftView" destination="y8l-oM-hTq" id="yRC-lN-bFB"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <sections/>
+                        <connections>
+                            <outlet property="dataSource" destination="Woe-wy-1ub" id="sTy-Rr-zbv"/>
+                            <outlet property="delegate" destination="Woe-wy-1ub" id="NhL-JT-3TV"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="yaO-99-kqm"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="600" height="892"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NP4-KS-FOx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4171" y="1335"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="DxL-eI-sgA">
             <objects>
