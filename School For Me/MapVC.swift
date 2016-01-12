@@ -92,7 +92,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         super.didReceiveMemoryWarning()
     }
     
-    
     // This can be modified using Notifications
     func populate() {
         SVProgressHUD.setDefaultMaskType(.Black)
@@ -101,7 +100,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         Async.background {
             let realm = try! Realm()
             let data = realm.objects(School)
-            print("We have \(data.count) locations in the database")
             
             if data.count < 1 {
                 // set onBoard to false.. exit and retry
@@ -121,7 +119,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         }.main {
             self.mapView.addAnnotations(locArray)
             self.mapView.showAnnotations(self.mapView.annotations, animated: true)
-            SVProgressHUD.dismissWithDelay(1)
+            SVProgressHUD.dismiss()
         }
     }
 }
