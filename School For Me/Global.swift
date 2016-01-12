@@ -21,7 +21,7 @@ struct Global {
         let sLat: Double = sCoordinates.latitude
         let sLng: Double = sCoordinates.longitude
         
-        let radius: Double = 3959.0 // Miles
+        let radius: Double = 3961.0 // Miles
         
         let deltaP = (sLat.degreesToRadians - uLat.degreesToRadians)
         let deltaL = (sLng.degreesToRadians - uLng.degreesToRadians)

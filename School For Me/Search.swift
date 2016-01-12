@@ -137,7 +137,6 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         cell.schoolDistrict.text = filteredResults[indexPath.row].district
         let sCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: Double(filteredResults[indexPath.row].lat)!, longitude: Double(filteredResults[indexPath.row].lon)!)
         let distance: Double = g.computeDistance(Global.userCoord!, sCoordinates: sCoordinate)
-        print("Location: \(filteredResults[indexPath.row].lat) \(filteredResults[indexPath.row].lon)")
         cell.schoolDistance.text = "\(distance.roundToPlaces(2)) miles away"
         cell.schoolName.sizeToFit()
         cell.schoolDistrict.sizeToFit()

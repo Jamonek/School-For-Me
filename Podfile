@@ -8,7 +8,7 @@ pod 'ObjectMapper', '~> 1.0'
 pod 'Alamofire', '~> 3.0'
 pod 'DZNEmptyDataSet'
 pod 'EAIntroView', '~> 2.8.0'
-pod 'SVProgressHUD', :head
+pod 'SVProgressHUD'
 pod 'AsyncSwift'
 pod 'Fabric'
 pod 'Crashlytics'
