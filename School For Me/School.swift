@@ -34,6 +34,13 @@ class School: Object, Mappable {
     dynamic var magnet = ""
     dynamic var lat = ""
     dynamic var lon = ""
+    dynamic var title1 = ""
+    dynamic var title1SchoolWide = ""
+    dynamic var students = ""
+    dynamic var teachers = ""
+    dynamic var studentTeacherRatio = ""
+    dynamic var freeLunch = ""
+    dynamic var reducedLunch = ""
     
     required convenience init?(_ map: Map) {
         self.init()
@@ -61,6 +68,13 @@ class School: Object, Mappable {
         magnet <- map["properties.magnet"]
         lat <- map["geometry.coordinates.lat"]
         lon <- map["geometry.coordinates.lon"]
+        title1 <- map["properties.title1"]
+        title1SchoolWide <- map["properties.title1_school_wide"]
+        students <- map["properties.students"]
+        teachers <- map["properties.teachers"]
+        studentTeacherRatio <- map["properties.student_teacher_ratio"]
+        freeLunch <- map["properties.free_lunch"]
+        reducedLunch <- map["properties.reduced_lunch"]
     }
     
     override static func primaryKey() -> String? {
