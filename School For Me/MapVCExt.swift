@@ -12,6 +12,7 @@ import MapKit
 import CoreLocation
 import FontAwesomeKit
 import RealmSwift
+import Async
 
 extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
     func presentSearchView(sender: UIButton) {
@@ -35,18 +36,15 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         if annotation is MKUserLocation {
             return nil
         } else if annotation.isKindOfClass(SchoolAnnotation) {
-            weak var pinView: MKPinAnnotationView? = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView
-            
-            if pinView == nil {
-                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
-                pinView?.pinTintColor = UIColor.redColor()
-                pinView?.schoolID = (annotation as! SchoolAnnotation).schoolID // kind of redundant ??
+            if let pinView: MKPinAnnotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView {
+                pinView.annotation = annotation
+                return pinView
             } else {
-                pinView?.annotation = annotation
+                let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
+                pinView.pinTintColor = UIColor.redColor()
+                return pinView
             }
-        return pinView
         }
-        
         return nil
     }
     
@@ -59,7 +57,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
                 }
             }
         }
-        
+
         let (x, y) = (mapView.bounds.width, mapView.bounds.height)
         let specialView: UIView = UIView(frame: CGRect(x: 0, y: y*0.42, width: x, height: y*0.6))
         let blurEffect = UIBlurEffect(style: .Light)
@@ -71,11 +69,15 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         let (sX, sY) = (specialView.bounds.width, specialView.bounds.height)
         // better way to do all of this too
         // get details
+        var sData: [School]!
+        var data: Results<School>!
+        
         let realm = try! Realm()
         let sID = (view.annotation as! SchoolAnnotation).schoolID
         let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(sID!))
-        let data = realm.objects(School).filter(filter)
-        let sData = data.map{ $0 } // :< 
+        data = realm.objects(School).filter(filter)
+        sData = data.map{ $0 } // :<
+        
         
         // Set our global var for passing selected location data
         Global.schoolID = (sData[0].id as NSString).integerValue

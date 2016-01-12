@@ -12,5 +12,6 @@ import UIKit
 class SearchCells: UITableViewCell {
     @IBOutlet var schoolName: UILabel!
     @IBOutlet var schoolDistrict: UILabel!
+    @IBOutlet var schoolDistance: UILabel!
     
 }

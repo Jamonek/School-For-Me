@@ -10,6 +10,7 @@ import UIKit
 import FontAwesomeKit
 import DZNEmptyDataSet
 import RealmSwift
+import MapKit
 
 class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet var searchBar: UISearchBar!
@@ -20,7 +21,8 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     var schoolData: Results<School>?
     let mainQueue = NSOperationQueue.mainQueue()
     var searchDict = ["title1":false, "charter":false, "magnet":false] // false represents off state, true being filter is applied
-
+    let g = Global()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Search"
@@ -44,7 +46,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
-        
+        self.tableView.keyboardDismissMode = .OnDrag
         //self.searchBar.backgroundColor = UIColor.flatSkyBlueColor()
         //self.searchBar.barTintColor = UIColor.flatSkyBlueColor()
         
@@ -130,14 +132,21 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell") as! SearchCells
-        
+        cell.backgroundColor = UIColor.flatSkyBlueColor()
         cell.schoolName.text = filteredResults[indexPath.row].school_name
         cell.schoolDistrict.text = filteredResults[indexPath.row].district
-        
-        cell.schoolDistrict.sizeToFit()
+        let sCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: Double(filteredResults[indexPath.row].lat)!, longitude: Double(filteredResults[indexPath.row].lon)!)
+        let distance: Double = g.computeDistance(Global.userCoord!, sCoordinates: sCoordinate)
+        print("Location: \(filteredResults[indexPath.row].lat) \(filteredResults[indexPath.row].lon)")
+        cell.schoolDistance.text = "\(distance.roundToPlaces(2)) miles away"
         cell.schoolName.sizeToFit()
-        
+        cell.schoolDistrict.sizeToFit()
+        cell.schoolDistance.sizeToFit()
         return cell
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 92
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -13,6 +13,7 @@ import CoreLocation
 import RealmSwift
 import SVProgressHUD
 import Async
+import iAd
 
 class MapVC: UIViewController, CLLocationManagerDelegate {
     @IBOutlet var mapView: MKMapView!
@@ -26,7 +27,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         // VC Title
         self.title = "School For Me"
         searchView.backgroundColor = UIColor.flatSkyBlueColor()
-        
+        self.canDisplayBannerAds = true
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: "presentSearchView:")
@@ -71,15 +72,19 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         guard let onBoard : Bool = SFMData.objectForKey("onBoard") as? Bool else {
             print("onBoard not set.. returning nil")
             SFMData.setBool(false, forKey: "onBoard")
+            Global.userCoord = locations.last!.coordinate
             return
         }
         
         if !onBoard {
             SFMData.setBool(true, forKey: "onBoard")
             print("Updating results")
+            Global.userCoord = locations.last!.coordinate
             School.fetchResults(withCoords: locations.last!.coordinate, andDistance: 25) { result in
                 self.populate()
             }
+        } else {
+            Global.userCoord = locations.last!.coordinate
         }
     }
     
@@ -105,12 +110,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             }
             
             var annotation = SchoolAnnotation()
-            
+            var coordinate = CLLocationCoordinate2D()
             for i in 0..<data.count {
-                let lat = (data[i].lat as NSString).doubleValue
-                let lon = (data[i].lon as NSString).doubleValue
+                coordinate.latitude = (data[i].lat as NSString).doubleValue
+                coordinate.longitude = (data[i].lon as NSString).doubleValue
                 let schoolID = (data[i].id as NSString).integerValue
-                let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
                 annotation = SchoolAnnotation(title: data[i].school_name, district: data[i].district, coordinate: coordinate, schoolID: schoolID)
                locArray.append(annotation)
             }

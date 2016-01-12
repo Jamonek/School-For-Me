@@ -10,18 +10,19 @@ import UIKit
 import FontAwesomeKit
 import RealmSwift
 import MapKit
+import Async
+import MessageUI
 
-class DetailTV: UITableViewController {
-    let realm = try! Realm()
+class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
     var schoolData: [School]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print("Select school: \(Global.schoolID)")
-        let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(Global.schoolID!))
-        let data = realm.objects(School).filter(filter)
-        schoolData = data.map{ $0 } // :<
+            let realm = try! Realm()
+            let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(Global.schoolID!))
+            let data = realm.objects(School).filter(filter)
+            self.schoolData = data.map{ $0 } // :<
         
         if let viewTitle: String = schoolData?[0].school_name {
             self.title = viewTitle
@@ -36,7 +37,7 @@ class DetailTV: UITableViewController {
         let reportIcon = FAKFontAwesome.flagIconWithSize(25)
         reportIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor())
         let reportIconImage = reportIcon.imageWithSize(CGSize(width: 30, height: 30))
-        let reportButton = UIBarButtonItem(image: reportIconImage, style: .Plain, target: self, action: nil)
+        let reportButton = UIBarButtonItem(image: reportIconImage, style: .Plain, target: self, action: "mailPop:")
         navigationItem.rightBarButtonItem = reportButton
         
         let closeIcon = FAKFontAwesome.chevronLeftIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
@@ -61,7 +62,8 @@ class DetailTV: UITableViewController {
             cell.detailLabel.text = "\(schoolData![0].street) \(schoolData![0].city), \(schoolData![0].state) \(schoolData![0].zip)"
             cell.detailLabel.numberOfLines = 0
             cell.detailLabel.sizeToFit()
-            let mapView = MKMapView(frame: CGRect(x: cell.bounds.width*0.108, y: cell.bounds.height+(cell.bounds.height*0.12), width: cell.bounds.width*0.60, height: cell.bounds.height+(cell.bounds.height*0.4)))
+            // MKMapView Frame: frame: CGRect(x: cell.bounds.width*0.108, y: cell.bounds.height+(cell.bounds.height*0.12), width: cell.bounds.width*0.60, height: cell.bounds.height+(cell.bounds.height*0.4))
+            let mapView = MKMapView(frame: CGRect(x: cell.bounds.width*0.108, y: cell.bounds.height, width: cell.bounds.width*0.60, height: cell.bounds.height+(cell.bounds.height*0.2)))
             let (lat, lng) = ((schoolData![0].lat as NSString).doubleValue, (schoolData![0].lon as NSString).doubleValue)
             let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lng)
             mapView.addAnnotation(SchoolAnnotation(title: schoolData![0].school_name, district: schoolData![0].district, coordinate: coordinate, schoolID: Global.schoolID!))
@@ -72,8 +74,11 @@ class DetailTV: UITableViewController {
             //mapView.userInteractionEnabled = false
             mapView.scrollEnabled = false
             cell.addSubview(mapView)
-            cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Height, relatedBy: .Equal, toItem: cell, attribute: .Height, multiplier: 1.0, constant: 0))
+            cell.detailLeftView.translatesAutoresizingMaskIntoConstraints = false
+            cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Top, relatedBy: .Equal, toItem: cell.contentView, attribute: .Top, multiplier: 1.0, constant: 0))
+            cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: -1))
             cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftImage, attribute: .CenterY, relatedBy: .Equal, toItem: cell, attribute: .CenterY, multiplier: 1.0, constant: 0))
+            cell.addConstraint(NSLayoutConstraint(item: mapView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: 0))
         case 2:
             weak var phoneIcon = FAKFontAwesome.phoneIconWithSize(25)
             phoneIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
@@ -126,6 +131,28 @@ class DetailTV: UITableViewController {
             }
             cell.detailLabel.text = "Magnet"
             cell.detailLeftImage.image = statusImage
+        case 8:
+            let userIcon = FAKFontAwesome.lineChartIconWithSize(25)
+            userIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            cell.detailLeftImage.image = userIcon.imageWithSize(CGSize(width: 30, height: 30))
+            cell.detailLabel.text = "Students: \(schoolData![0].students) | Teachers: \(schoolData![0].teachers) | Student/Teacher Ratio: \(schoolData![0].studentTeacherRatio) | Free Lunch: \(schoolData![0].freeLunch) | Reduced Lunch: \(schoolData![0].reducedLunch)"
+            cell.detailLabel.sizeToFit()
+        case 9:
+            var statusImage: UIImage!
+            switch schoolData![0].title1 {
+            case "Yes":
+                let statusIcon = FAKFontAwesome.checkIconWithSize(25)
+                statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+                statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
+            case "No":
+                let statusIcon = FAKFontAwesome.timesIconWithSize(25)
+                statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+                statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
+            default:
+                break
+            }
+            cell.detailLabel.text = "Title 1"
+            cell.detailLeftImage.image = statusImage
         default:
             break
         }
@@ -143,11 +170,47 @@ class DetailTV: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
+        return 10
     }
     
     func dismissView(sender: AnyObject) {
         self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func mailPop(sender: AnyObject) {
+        let toRecipents = ["jamone.kelly@gmail.com"]
+        let mc: MFMailComposeViewController = MFMailComposeViewController()
+        mc.mailComposeDelegate = self
+        if(!MFMailComposeViewController.canSendMail()) {
+            let alert = UIAlertController(title: "Error", message: "Unable to send email from this device.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
+        let messageBody = "Please do not modify the data below this line. \n--------------------------------\n \(schoolData!.description)"
+        
+        mc.setSubject("SFM: Location report")
+        mc.setMessageBody(messageBody, isHTML: false)
+        mc.setToRecipients(toRecipents)
+        
+        self.presentViewController(mc, animated: true, completion: nil)
+    }
+    
+    func mailComposeController(controller:MFMailComposeViewController, didFinishWithResult result:MFMailComposeResult, error:NSError?) {
+        switch result.rawValue {
+        case MFMailComposeResultCancelled.rawValue:
+            print("Mail cancelled")
+        case MFMailComposeResultSaved.rawValue:
+            print("Mail saved")
+        case MFMailComposeResultSent.rawValue:
+            print("Mail sent")
+        case MFMailComposeResultFailed.rawValue:
+            print("Mail sent failure: %@", error!.localizedDescription)
+        default:
+            break
+        }
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     override func viewDidDisappear(animated: Bool) {
