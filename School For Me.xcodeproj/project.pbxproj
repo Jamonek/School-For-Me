@@ -13,6 +13,7 @@
 		6417DFA81C2753C80015F95B /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6417DFA71C2753C80015F95B /* Globals.swift */; };
 		641CD3B91C442EC70090A18A /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 641CD3B81C442EC70090A18A /* iAd.framework */; };
 		641CD3BB1C445A560090A18A /* DoubleExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641CD3BA1C445A560090A18A /* DoubleExt.swift */; };
+		641CD3BD1C44A4A60090A18A /* Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641CD3BC1C44A4A60090A18A /* Distance.swift */; };
 		642137D41C3E26D1009EBB3F /* MKPinAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */; };
 		642137D61C3E4E7F009EBB3F /* StringExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642137D51C3E4E7F009EBB3F /* StringExt.swift */; };
 		642DA1051C1E12C300419867 /* School.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1041C1E12C300419867 /* School.swift */; };
@@ -63,6 +64,7 @@
 		6417DFA71C2753C80015F95B /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		641CD3B81C442EC70090A18A /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		641CD3BA1C445A560090A18A /* DoubleExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleExt.swift; sourceTree = "<group>"; };
+		641CD3BC1C44A4A60090A18A /* Distance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Distance.swift; sourceTree = "<group>"; };
 		642137D31C3E26D1009EBB3F /* MKPinAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MKPinAnnotationView.swift; sourceTree = "<group>"; };
 		642137D51C3E4E7F009EBB3F /* StringExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExt.swift; sourceTree = "<group>"; };
 		642DA1041C1E12C300419867 /* School.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = School.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				646F31C01C41EFB6002B432C /* UIViewControllerExt.swift */,
 				646F31C21C41F79C002B432C /* Global.swift */,
 				641CD3BA1C445A560090A18A /* DoubleExt.swift */,
+				641CD3BC1C44A4A60090A18A /* Distance.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -465,6 +468,7 @@
 				64C6B26E1C16274600ADE887 /* MapVCExt.swift in Sources */,
 				642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */,
 				646F31BD1C41E3EF002B432C /* DetailTV.swift in Sources */,
+				641CD3BD1C44A4A60090A18A /* Distance.swift in Sources */,
 				64B8F25F1C1515CB005BC4A9 /* MapVC.swift in Sources */,
 				642137D41C3E26D1009EBB3F /* MKPinAnnotationView.swift in Sources */,
 				642DA1071C1E15C900419867 /* School+Networking.swift in Sources */,
