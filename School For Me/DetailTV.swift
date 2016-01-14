@@ -19,12 +19,12 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-            let realm = try! Realm()
-            let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(Global.schoolID!))
-            let data = realm.objects(School).filter(filter)
-            self.schoolData = data.map{ $0 } // :<
+        let realm = try! Realm()
+        let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(Global.schoolID!))
+        let data = realm.objects(School).filter(filter)
+        self.schoolData = data.map{ $0 } // :<
         
-        if let viewTitle: String = schoolData?[0].school_name {
+        if let viewTitle: String = self.schoolData?[0].school_name {
             self.title = viewTitle
         }
         
@@ -76,7 +76,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             cell.addSubview(mapView)
             cell.detailLeftView.translatesAutoresizingMaskIntoConstraints = false
             cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Top, relatedBy: .Equal, toItem: cell.contentView, attribute: .Top, multiplier: 1.0, constant: 0))
-            cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: -1))
+            cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: 0))
             cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftImage, attribute: .CenterY, relatedBy: .Equal, toItem: cell, attribute: .CenterY, multiplier: 1.0, constant: 0))
             cell.addConstraint(NSLayoutConstraint(item: mapView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: 0))
         case 2:
@@ -106,12 +106,10 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
                 let statusIcon = FAKFontAwesome.checkIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            case "No":
+            default:
                 let statusIcon = FAKFontAwesome.timesIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            default:
-                break
             }
             cell.detailLabel.text = "Charter"
             cell.detailLeftImage.image = statusImage
@@ -122,12 +120,10 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
                 let statusIcon = FAKFontAwesome.checkIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            case "No":
+            default:
                 let statusIcon = FAKFontAwesome.timesIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            default:
-                break
             }
             cell.detailLabel.text = "Magnet"
             cell.detailLeftImage.image = statusImage
@@ -135,7 +131,8 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             let userIcon = FAKFontAwesome.lineChartIconWithSize(25)
             userIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = userIcon.imageWithSize(CGSize(width: 30, height: 30))
-            cell.detailLabel.text = "Students: \(schoolData![0].students) | Teachers: \(schoolData![0].teachers) | Student/Teacher Ratio: \(schoolData![0].studentTeacherRatio) | Free Lunch: \(schoolData![0].freeLunch) | Reduced Lunch: \(schoolData![0].reducedLunch)"
+            cell.detailLabel.text = "Students: \(Int(schoolData![0].students)) | Teachers: \(Int(schoolData![0].teachers)) | Student/Teacher Ratio: \(Double(schoolData![0].studentTeacherRatio)?.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)?.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)?.roundToPlaces(2))"
+            cell.detailLabel.numberOfLines = 0
             cell.detailLabel.sizeToFit()
         case 9:
             var statusImage: UIImage!
@@ -144,12 +141,10 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
                 let statusIcon = FAKFontAwesome.checkIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            case "No":
+            default:
                 let statusIcon = FAKFontAwesome.timesIconWithSize(25)
                 statusIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
                 statusImage = statusIcon.imageWithSize(CGSize(width: 30, height: 30))
-            default:
-                break
             }
             cell.detailLabel.text = "Title 1"
             cell.detailLeftImage.image = statusImage
