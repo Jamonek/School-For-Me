@@ -12,6 +12,7 @@ import ChameleonFramework
 import Fabric
 import Crashlytics
 import RealmSwift
+import Buglife
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlueColor(), withContentStyle: .Contrast)
         Fabric.with([Crashlytics.self])
+        Buglife.sharedBuglife().startWithAPIKey("DUMMY-KEY")
         
         // Taken from https://realm.io/docs/swift/latest/#migrations
         let config = Realm.Configuration(

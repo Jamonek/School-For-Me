@@ -131,7 +131,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             let userIcon = FAKFontAwesome.lineChartIconWithSize(25)
             userIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = userIcon.imageWithSize(CGSize(width: 30, height: 30))
-            cell.detailLabel.text = "Students: \(Double(schoolData![0].students)) | Teachers: \(Double(schoolData![0].teachers)) | S/T Ratio: \(Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)!.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)!.roundToPlaces(2))"
+            cell.detailLabel.text = "Students: \(Double(schoolData![0].students)!) | Teachers: \(Double(schoolData![0].teachers)!) | S/T Ratio: \(Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)!.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)!.roundToPlaces(2))"
             cell.detailLabel.numberOfLines = 0
             cell.detailLabel.sizeToFit()
         case 9:
