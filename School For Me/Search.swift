@@ -53,16 +53,19 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         // Observers
         NSNotificationCenter.defaultCenter().addObserverForName("titleSwitchNotification", object: nil, queue: mainQueue,
             usingBlock: { _ in
+                print("Title1 notification hit")
                 if self.searchDict["title1"]! {
                     // remove filter
                     self.searchDict["title1"] = false
                 } else {
                     // apply filter
-                    self.searchDict["titl1"] = true
+                    self.searchDict["title1"] = true
                 }
+                self.updateResults()
         })
         NSNotificationCenter.defaultCenter().addObserverForName("magnetSwitchNotification", object: nil, queue: mainQueue,
             usingBlock: { _ in
+                print("Magnet notification hit")
                 if self.searchDict["magnet"]! {
                     // remove filter
                     self.searchDict["magnet"] = false
@@ -70,9 +73,11 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
                     // apply filter
                     self.searchDict["magnet"] = true
                 }
+                self.updateResults()
         })
         NSNotificationCenter.defaultCenter().addObserverForName("charterSwitchNotification", object: nil, queue: mainQueue,
             usingBlock: { _ in
+                print("Charter notification hit")
                 if self.searchDict["charter"]! {
                     // remove filter
                     self.searchDict["charter"] = false
@@ -80,6 +85,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
                     // apply filter
                     self.searchDict["charter"] = true
                 }
+                self.updateResults()
         })
     }
     
@@ -162,6 +168,38 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         filterSchools(searchString: searchText)
     }
     
+    // Quick, and dirty way to attempt filtering
+    // Pretty redundant.. refactor coming soon
+    // Rush to market for 1.0 then rewrite for quality
+    func updateResults() -> Void {
+        var predicates = [NSPredicate]()
+        
+        if !self.searchString.isEmpty {
+            let or1 = NSPredicate(format: "school_name CONTAINS[c] %@", searchString)
+            let or2 = NSPredicate(format: "city CONTAINS[c] %@", searchString)
+            predicates = [or1, or2]
+        }
+        
+        if self.searchDict["charter"]! {
+            predicates.append(NSPredicate(format: "charter = 'Yes'"))
+        }
+        
+        if self.searchDict["magnet"]! {
+            predicates.append(NSPredicate(format: "magnet = 'Yes'"))
+        }
+        
+        if self.searchDict["title1"]! {
+            predicates.append(NSPredicate(format: "title1 = 'Yes'"))
+        }
+        
+        let predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+        let results = schoolData!.filter(predicate)
+        for result in results {
+            filteredResults.append(result)
+        }
+        self.tableView.reloadData()
+    }
+    
     func filterSchools(searchString searchText: String = "") {
         if searchText.isEmpty {
             filteredResults.removeAll()
@@ -174,7 +212,9 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         }
         filteredResults.removeAll()
         self.searchString = searchText
-        var predicates = [NSPredicate(format: "school_name CONTAINS[c] %@", searchText)]
+        let or1 = NSPredicate(format: "school_name CONTAINS[c] %@", searchText)
+        let or2 = NSPredicate(format: "city CONTAINS[c] %@", searchText)
+        var predicates = [or1, or2]
         
         if self.searchDict["charter"]! {
                 predicates.append(NSPredicate(format: "charter = 'Yes'"))
@@ -182,6 +222,10 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         
         if self.searchDict["magnet"]! {
             predicates.append(NSPredicate(format: "magnet = 'Yes'"))
+        }
+        
+        if self.searchDict["title1"]! {
+            predicates.append(NSPredicate(format: "title1 = 'Yes'"))
         }
         
         let predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)

@@ -51,13 +51,13 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
         cell.userInteractionEnabled = false
         switch indexPath.row {
         case 0:
-            weak var schoolIcon = FAKFontAwesome.buildingIconWithSize(25)
-            schoolIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let schoolIcon = FAKFontAwesome.buildingIconWithSize(25)
+            schoolIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = schoolIcon?.imageWithSize(CGSize(width: 30, height: 30))
             cell.detailLabel.text = schoolData![0].school_name
         case 1:
-            weak var locationIcon = FAKFontAwesome.mapMarkerIconWithSize(25)
-            locationIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let locationIcon = FAKFontAwesome.mapMarkerIconWithSize(25)
+            locationIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = locationIcon?.imageWithSize(CGSize(width: 30, height: 30))
             cell.detailLabel.text = "\(schoolData![0].street) \(schoolData![0].city), \(schoolData![0].state) \(schoolData![0].zip)"
             cell.detailLabel.numberOfLines = 0
@@ -80,23 +80,23 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             cell.addConstraint(NSLayoutConstraint(item: cell.detailLeftImage, attribute: .CenterY, relatedBy: .Equal, toItem: cell, attribute: .CenterY, multiplier: 1.0, constant: 0))
             cell.addConstraint(NSLayoutConstraint(item: mapView, attribute: .Bottom, relatedBy: .Equal, toItem: cell.contentView, attribute: .Bottom, multiplier: 1.0, constant: 0))
         case 2:
-            weak var phoneIcon = FAKFontAwesome.phoneIconWithSize(25)
-            phoneIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let phoneIcon = FAKFontAwesome.phoneIconWithSize(25)
+            phoneIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = phoneIcon?.imageWithSize(CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].phone
         case 3:
-            weak var infoIcon = FAKFontAwesome.infoIconWithSize(25)
-            infoIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let infoIcon = FAKFontAwesome.infoIconWithSize(25)
+            infoIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = infoIcon?.imageWithSize(CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].district
         case 4:
-            weak var infoIcon = FAKFontAwesome.infoIconWithSize(25)
-            infoIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let infoIcon = FAKFontAwesome.infoIconWithSize(25)
+            infoIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = infoIcon?.imageWithSize(CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].county_name
         case 5:
-            weak var gradIcon = FAKFontAwesome.graduationCapIconWithSize(25)
-            gradIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
+            let gradIcon = FAKFontAwesome.graduationCapIconWithSize(25)
+            gradIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = gradIcon?.imageWithSize(CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = "\(schoolData![0].low_grade) - \(schoolData![0].high_grade)"
         case 6:
@@ -131,7 +131,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             let userIcon = FAKFontAwesome.lineChartIconWithSize(25)
             userIcon.addAttribute(NSForegroundColorAttributeName, value: UIColor.whiteColor())
             cell.detailLeftImage.image = userIcon.imageWithSize(CGSize(width: 30, height: 30))
-            cell.detailLabel.text = "Students: \(Int(schoolData![0].students)) | Teachers: \(Int(schoolData![0].teachers)) | Student/Teacher Ratio: \(Double(schoolData![0].studentTeacherRatio)?.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)?.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)?.roundToPlaces(2))"
+            cell.detailLabel.text = "Students: \(Double(schoolData![0].students)!) | Teachers: \(Double(schoolData![0].teachers)!) | S/T Ratio: \(Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)!.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)!.roundToPlaces(2))"
             cell.detailLabel.numberOfLines = 0
             cell.detailLabel.sizeToFit()
         case 9:
