@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlueColor(), withContentStyle: .Contrast)
         Fabric.with([Crashlytics.self])
+        Buglife.sharedBuglife().invocationOptions = .Shake
         Buglife.sharedBuglife().startWithAPIKey("DUMMY-KEY")
         
         // Taken from https://realm.io/docs/swift/latest/#migrations

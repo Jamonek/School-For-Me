@@ -31,8 +31,8 @@ class FilterVC: UIViewController {
         let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon, style: .Plain, target: self, action: "dismissView:")
         
-        let doneIcon = FAKFontAwesome.checkIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: doneIcon, style: .Plain, target: self, action: nil)
+        //let doneIcon = FAKFontAwesome.checkIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
+        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: doneIcon, style: .Plain, target: self, action: nil)
         
         // Switches
         charterSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
