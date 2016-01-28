@@ -21,6 +21,7 @@
 		642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1081C1E168900419867 /* NSObject+Extensions.swift */; };
 		642DA10B1C1E2C3D00419867 /* SchoolAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */; };
 		646778FB1C3F4A470060ECD6 /* UIViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646778FA1C3F4A470060ECD6 /* UIViewExt.swift */; };
+		646A35E61C51ECD3002131AF /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646A35E51C51ECD3002131AF /* SnapshotHelper.swift */; };
 		646F31BD1C41E3EF002B432C /* DetailTV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646F31BC1C41E3EF002B432C /* DetailTV.swift */; };
 		646F31BF1C41E400002B432C /* DetailTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646F31BE1C41E400002B432C /* DetailTVCell.swift */; };
 		646F31C11C41EFB6002B432C /* UIViewControllerExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646F31C01C41EFB6002B432C /* UIViewControllerExt.swift */; };
@@ -72,6 +73,7 @@
 		642DA1081C1E168900419867 /* NSObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+Extensions.swift"; sourceTree = "<group>"; };
 		642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchoolAnnotations.swift; sourceTree = "<group>"; };
 		646778FA1C3F4A470060ECD6 /* UIViewExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExt.swift; sourceTree = "<group>"; };
+		646A35E51C51ECD3002131AF /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		646F31BC1C41E3EF002B432C /* DetailTV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailTV.swift; sourceTree = "<group>"; };
 		646F31BE1C41E400002B432C /* DetailTVCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailTVCell.swift; sourceTree = "<group>"; };
 		646F31C01C41EFB6002B432C /* UIViewControllerExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewControllerExt.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 		64B8F27E1C1515CC005BC4A9 /* School For MeUITests */ = {
 			isa = PBXGroup;
 			children = (
+				646A35E51C51ECD3002131AF /* SnapshotHelper.swift */,
 				64B8F27F1C1515CC005BC4A9 /* School_For_MeUITests.swift */,
 				64B8F2811C1515CC005BC4A9 /* Info.plist */,
 			);
@@ -496,6 +499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64B8F2801C1515CC005BC4A9 /* School_For_MeUITests.swift in Sources */,
+				646A35E61C51ECD3002131AF /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,6 +627,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "School For Me/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-Me";
@@ -639,6 +644,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "School For Me/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-Me";

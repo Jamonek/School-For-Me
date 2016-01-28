@@ -22,7 +22,7 @@ extension School {
             "distance": distance
         ]
 
-        Alamofire.request(.GET, "http://api.jamonek.com/sfm/geo.php", parameters: param).responseJSON { response in
+        Alamofire.request(.GET, "https://api.jamonek.com/sfm/geo.php", parameters: param).responseJSON { response in
             print(response.request)
             if response.result.error != nil {
                 return
