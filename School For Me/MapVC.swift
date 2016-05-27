@@ -13,9 +13,9 @@ import CoreLocation
 import RealmSwift
 import SVProgressHUD
 import Async
-import iAd
+import mopub_ios_sdk
 
-class MapVC: UIViewController, CLLocationManagerDelegate {
+class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var searchBar: UISearchBar!
     var locationManager : CLLocationManager!
@@ -24,10 +24,21 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.adView.delegate = self
+        
+        // Positions the ad at the bottom, with the correct size
+        self.adView.frame = CGRectMake(0, self.view.bounds.size.height - MOPUB_BANNER_SIZE.height,
+                                       MOPUB_BANNER_SIZE.width, MOPUB_BANNER_SIZE.height)
+        self.view.addSubview(self.adView)
+        
+        // Loads the ad over the network
+        self.adView.loadAd()
+
+        
         // VC Title
         self.title = "School For Me"
         searchView.backgroundColor = UIColor.flatSkyBlueColor()
-        self.canDisplayBannerAds = true
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: "presentSearchView:")
@@ -76,6 +87,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             SVProgressHUD.dismiss()
             self.populate()
         }
+    }
+    
+    func viewControllerForPresentingModalView() -> UIViewController {
+        return self
     }
     
     // Better solution coming soon.. temporary
