@@ -31,6 +31,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: "presentSearchView:")
+        SVProgressHUD.setDefaultMaskType(.Black)
+        SVProgressHUD.showWithStatus("Contacting school for me server..")
         
         // Delegates
         self.mapView.delegate = self
@@ -43,11 +45,20 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             locationManager.requestWhenInUseAuthorization()
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
-            self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
+            //self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
             mapView.showsUserLocation = true // Show current location of user
         } else {
             let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
+        if !Reachability.isConnectedToNetwork() {
+            let alert = UIAlertController(title: "Error", message: "A network connection is unavailable at the moment.", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+            self.locationManager.stopUpdatingLocation()
+            SVProgressHUD.dismiss()
             self.presentViewController(alert, animated: true, completion: nil)
             return
         }
@@ -62,13 +73,14 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         
         if onBoard && School.total() > 0 {
             // load local db
+            SVProgressHUD.dismiss()
             self.populate()
-            
         }
     }
     
     // Better solution coming soon.. temporary
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        //print("Coord: \(locations.last!.coordinate)")
         guard let onBoard : Bool = SFMData.objectForKey("onBoard") as? Bool else {
             print("onBoard not set.. returning nil")
             SFMData.setBool(false, forKey: "onBoard")
@@ -79,9 +91,20 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         if !onBoard {
             SFMData.setBool(true, forKey: "onBoard")
             print("Updating results")
+            
             Global.userCoord = locations.last!.coordinate
             School.fetchResults(withCoords: locations.last!.coordinate, andDistance: 25) { result in
-                self.populate()
+                if result {
+                    SVProgressHUD.dismiss()
+                    self.populate()
+                } else {
+                    let alert = UIAlertController(title: "Error", message: "Unable to find any schools within your area. Check back soon.", preferredStyle: .Alert)
+                    alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+                    self.locationManager.stopUpdatingLocation()
+                    SVProgressHUD.dismiss()
+                    self.presentViewController(alert, animated: true, completion: nil)
+                    return
+                }
             }
         } else {
             Global.userCoord = locations.last!.coordinate
