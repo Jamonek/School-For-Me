@@ -22,7 +22,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     @IBOutlet var searchView: UIView!
     @IBOutlet var MVTopConstraint: NSLayoutConstraint!
     
-    var adView: MPAdView = MPAdView(adUnitId: "", size: MOPUB_BANNER_SIZE)
+    var adView: MPAdView = MPAdView(adUnitId: "ea61ed364b0b4be4a2c61f6655cb9153", size: MOPUB_BANNER_SIZE)
 
     override func viewDidLoad() {
         super.viewDidLoad()
