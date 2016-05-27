@@ -18,13 +18,23 @@ extension School {
     static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: (result: Bool) -> Void) {
         let param: [String: AnyObject] = [
             "lat": coordinate.latitude,
-            "lon": coordinate.longitude,
+            "lng": coordinate.longitude,
             "distance": distance
         ]
-
-        Alamofire.request(.GET, "https://api.jamonek.com/sfm/geo.php", parameters: param).responseJSON { response in
+        
+        if !Reachability.isConnectedToNetwork() {
+            completion(result: false)
+            print("no connection called")
+            return
+        }
+        
+        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForResource = 5
+        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForRequest = 5
+        Alamofire.Manager.sharedInstance.request(.POST, "https://jamonek.com/api/sfm/geo.php", parameters: param).responseJSON { response in
             print(response.request)
-            if response.result.error != nil {
+            if response.result.isFailure {
+                print("API Failure")
+                completion(result: false)
                 return
             }
             
@@ -39,12 +49,14 @@ extension School {
                             }
                         } catch {
                             print("Error adding location")
+                            completion(result: false)
                         }
                     }
                 }
                 completion(result: true)
                 return
             } else {
+                print("Unable to parse JSON.. possibly no data")
                 completion(result: false)
                 return
             }

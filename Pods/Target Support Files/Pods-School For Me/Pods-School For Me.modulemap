@@ -1,0 +1,6 @@
+framework module Pods_School_For_Me {
+  umbrella header "Pods-School For Me-umbrella.h"
+
+  export *
+  module * { export * }
+}
