@@ -13,4 +13,5 @@ target 'School For Me' do
     pod 'AsyncSwift'
     pod 'Fabric'
     pod 'Crashlytics'
+    pod 'Firebase/Messaging'
 end
