@@ -7,7 +7,7 @@ AlamofireObjectMapper
 
 An extension to [Alamofire](https://github.com/Alamofire/Alamofire) which automatically converts JSON response data into swift objects using [ObjectMapper](https://github.com/Hearst-DD/ObjectMapper/). 
 
-#Usage
+# Usage
 
 Given a URL which returns weather data in the following form:
 ```
@@ -33,10 +33,12 @@ Given a URL which returns weather data in the following form:
 }
 ```
 
-You can use this extension as the follows:
+You can use the extension as the follows:
 ```swift
-let URL = "https://raw.githubusercontent.com/tristanhimmelman/AlamofireObjectMapper/2ee8f34d21e8febfdefb2b3a403f18a43818d70a/sample_keypath_json"
-Alamofire.request(.GET, URL).responseObject("data") { (response: Response<WeatherResponse, NSError>) in
+import AlamofireObjectMapper
+
+let URL = "https://raw.githubusercontent.com/tristanhimmelman/AlamofireObjectMapper/d8bb95982be8a11a2308e779bb9a9707ebe42ede/sample_json"
+Alamofire.request(URL).responseObject { (response: DataResponse<WeatherResponse>) in
 
     let weatherResponse = response.result.value
     print(weatherResponse?.location)
@@ -53,11 +55,13 @@ Alamofire.request(.GET, URL).responseObject("data") { (response: Response<Weathe
 The `WeatherResponse` object in the completion handler is a custom object which you define. The only requirement is that the object must conform to [ObjectMapper's](https://github.com/Hearst-DD/ObjectMapper/) `Mappable` protocol. In the above example, the `WeatherResponse` object looks like the following:
 
 ```swift
+import ObjectMapper
+
 class WeatherResponse: Mappable {
     var location: String?
     var threeDayForecast: [Forecast]?
     
-	required init?(_ map: Map){
+	required init?(map: Map){
 
 	}
     
@@ -72,7 +76,7 @@ class Forecast: Mappable {
     var temperature: Int?
     var conditions: String?
     
-	required init?(_ map: Map){
+	required init?(map: Map){
 
 	}
     
@@ -84,43 +88,59 @@ class Forecast: Mappable {
 }
 ```
 
-The extension uses Generics to allow you to create your own custom response objects. Below are four functions which you can use to have your responses mapped to objects. Just replace `T` with your custom response object and the extension handles the rest: 
+The extension uses Generics to allow you to create your own custom response objects. Below is the `responseObject` function definition. Just replace `T` in the completionHandler with your custom response object and the extension handles the rest: 
 ```swift
-public func responseObject<T: Mappable>(completionHandler: Response<T, NSError> -> Void) -> Self
+public func responseObject<T: Mappable>(queue queue: dispatch_queue_t? = nil, keyPath: String? = nil, mapToObject object: T? = nil, completionHandler: DataResponse<T> -> Void) -> Self
+```
+The `responseObject` function has 3 optional parameters and a required completionHandler:
+- `queue`: The queue on which the completion handler is dispatched.
+- `keyPath`: The key path of the JSON where object mapping should be performed
+- `mapToObject`: An object to perform the mapping on to
+- `completionHandler`: A closure to be executed once the request has finished and the data has been mapped by ObjectMapper.
+
+### Easy Mapping of Nested Objects
+
+AlamofireObjectMapper supports dot notation within keys for easy mapping of nested objects. Given the following JSON String:
+```json
+"distance" : {
+     "text" : "102 ft",
+     "value" : 31
+}
+```
+You can access the nested objects as follows:
+```swift
+func mapping(map: Map) {
+    distance <- map["distance.value"]
+}
+```
+[See complete documentation](https://github.com/Hearst-DD/ObjectMapper#easy-mapping-of-nested-objects)
+
+### KeyPath
+
+The `keyPath` variable is used to drill down into a JSON response and only map the data found at that `keyPath`. It supports nested values such as `data.weather` to drill down several levels in a JSON response.
+```swift
+let URL = "https://raw.githubusercontent.com/tristanhimmelman/AlamofireObjectMapper/2ee8f34d21e8febfdefb2b3a403f18a43818d70a/sample_keypath_json"
+let expectation = expectationWithDescription("\(URL)")
+
+Alamofire.request(URL).responseObject(keyPath: "data") { (response: DataResponse<WeatherResponse>) in
+    expectation.fulfill()
+    
+    let weatherResponse = response.result.value
+    print(weatherResponse?.location)
+    
+    if let threeDayForecast = weatherResponse?.threeDayForecast {
+        for forecast in threeDayForecast {
+            print(forecast.day)
+            print(forecast.temperature)           
+        }
+    }
+}
 ```
 
+# Array Responses
+If you have an endpoint that returns data in `Array` form you can map it with the following function:
 ```swift
-public func responseObject<T: Mappable>(keyPath: String, completionHandler: Response<T, NSError> -> Void) -> Self
-```
-
-```swift
-public func responseObject<T: Mappable>(queue: dispatch_queue_t?, completionHandler: Response<T, NSError> -> Void) -> Self
-```
-
-```swift
-public func responseObject<T: Mappable>(queue: dispatch_queue_t?, keyPath: String?, completionHandler: Response<T, NSError> -> Void) -> Self
-```
-
-###KeyPath
-
-The `keyPath` variable in the functions above is used to drill down in a JSON response and only map the data at that `keyPath`. It also supports nested values such as `data.weather` to drill down several levels in a JSON response.
-
-#Array Responses
-If you have an endpoint that returns data in `Array` form you can map it with the following functions:
-```swift
-public func responseArray<T: Mappable>(completionHandler: Response<[T], NSError> -> Void) -> Self
-```
-
-```swift
-public func responseArray<T: Mappable>(keyPath: String, completionHandler: Response<[T], NSError> -> Void) -> Self
-```
-
-```swift
-public func responseArray<T: Mappable>(queue: dispatch_queue_t?, completionHandler: Response<[T], NSError> -> Void) -> Self
-```
-
-```swift
-public func responseArray<T: Mappable>(queue: dispatch_queue_t?, keyPath: String?, completionHandler: Response<[T], NSError> -> Void) -> Self
+public func responseArray<T: Mappable>(queue queue: dispatch_queue_t? = nil, keyPath: String? = nil, completionHandler: DataResponse<[T]> -> Void) -> Self
 ```
 
 For example, if your endpoint returns the following:
@@ -146,7 +166,7 @@ For example, if your endpoint returns the following:
 You can request and map it as follows:
 ```swift
 let URL = "https://raw.githubusercontent.com/tristanhimmelman/AlamofireObjectMapper/f583be1121dbc5e9b0381b3017718a70c31054f7/sample_array_json"
-Alamofire.request(.GET, URL).responseArray { (response: Response<[Forecast], NSError>) in
+Alamofire.request(URL).responseArray { (response: DataResponse<[Forecast]>) in
 
     let forecastArray = response.result.value
     
@@ -160,13 +180,13 @@ Alamofire.request(.GET, URL).responseArray { (response: Response<[Forecast], NSE
 
 ```
 
-#Installation
+# Installation
 AlamofireObjectMapper can be added to your project using [CocoaPods](https://cocoapods.org/) by adding the following line to your Podfile:
 ```
-pod 'AlamofireObjectMapper', '~> 2.1'
+pod 'AlamofireObjectMapper', '~> 4.0'
 ```
 
-If your using [Carthage](https://github.com/Carthage/Carthage) you can add a dependency on AlamofireObjectMapper by adding it to your Cartfile:
+If you're using [Carthage](https://github.com/Carthage/Carthage) you can add a dependency on AlamofireObjectMapper by adding it to your Cartfile:
 ```
-github "tristanhimmelman/AlamofireObjectMapper" ~> 2.1
+github "tristanhimmelman/AlamofireObjectMapper" ~> 4.0
 ```

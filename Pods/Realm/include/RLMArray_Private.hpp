@@ -17,58 +17,42 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.h"
-#import <Realm/RLMResults.h>
 
-#import <memory>
-#import <vector>
+#import "RLMCollection_Private.hpp"
+
+#import "RLMResults_Private.hpp"
+
+#import <realm/link_view_fwd.hpp>
+#import <realm/table_ref.hpp>
 
 namespace realm {
-    class LinkView;
     class Results;
-    class TableView;
-    struct SortOrder;
-
-    namespace util {
-        template<typename T> class bind_ptr;
-    }
-    typedef util::bind_ptr<LinkView> LinkViewRef;
 }
 
-@class RLMObjectBase;
-@class RLMObjectSchema;
+@class RLMObjectBase, RLMObjectSchema, RLMProperty;
+class RLMClassInfo;
 class RLMObservationInfo;
 
-@protocol RLMFastEnumerable
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
-@property (nonatomic, readonly) NSUInteger count;
-
-- (NSUInteger)indexInSource:(NSUInteger)index;
-- (realm::TableView)tableView;
-@end
-
 @interface RLMArray () {
-  @protected
+@protected
     NSString *_objectClassName;
-  @public
+    RLMPropertyType _type;
+    BOOL _optional;
+@public
     // The name of the property which this RLMArray represents
     NSString *_key;
     __weak RLMObjectBase *_parentObject;
 }
 @end
 
+@interface RLMManagedArray : RLMArray <RLMFastEnumerable>
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+- (RLMManagedArray *)initWithList:(realm::List)list
+                            realm:(__unsafe_unretained RLMRealm *const)realm
+                       parentInfo:(RLMClassInfo *)parentInfo
+                         property:(__unsafe_unretained RLMProperty *const)property;
 
-//
-// LinkView backed RLMArray subclass
-//
-@interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
-@property (nonatomic, unsafe_unretained) RLMObjectSchema *objectSchema;
-
-+ (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
-                                          view:(realm::LinkViewRef)view
-                                         realm:(RLMRealm *)realm
-                                           key:(NSString *)key
-                                  parentSchema:(RLMObjectSchema *)parentSchema;
+- (bool)isBackedByList:(realm::List const&)list;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
@@ -77,29 +61,13 @@ class RLMObservationInfo;
 void RLMValidateArrayObservationKey(NSString *keyPath, RLMArray *array);
 
 // Initialize the observation info for an array if needed
-void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info, NSString *keyPath, RLMArray *array, id observed);
+void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
+                                   NSString *keyPath, RLMArray *array, id observed);
 
 
 //
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectSchema:(RLMObjectSchema *)objectSchema
-                                   results:(realm::Results)results;
-
 - (void)deleteObjectsFromRealm;
-@end
-
-// An object which encapulates the shared logic for fast-enumerating RLMArray
-// and RLMResults, and has a buffer to store strong references to the current
-// set of enumerated items
-@interface RLMFastEnumerator : NSObject
-- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection objectSchema:(RLMObjectSchema *)objectSchema;
-
-// Detach this enumerator from the source collection. Must be called before the
-// source collection is changed.
-- (void)detach;
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
-                                    count:(NSUInteger)len;
 @end

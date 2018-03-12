@@ -15,6 +15,8 @@
 #import "MPCoreInstanceProvider.h"
 #import "MPReachability.h"
 #import "MPAPIEndpoints.h"
+#import "MPViewabilityTracker.h"
+#import "NSString+MPAdditions.h"
 
 static NSString * const kMoPubInterfaceOrientationPortrait = @"p";
 static NSString * const kMoPubInterfaceOrientationLandscape = @"l";
@@ -42,6 +44,7 @@ static NSInteger const kAdSequenceNone = -1;
 + (NSString *)queryParameterForAdSequence:(NSInteger)adSequence;
 + (NSString *)queryParameterForPhysicalScreenSize;
 + (NSString *)queryParameterForBundleIdentifier;
++ (NSString *)queryParameterForAppTransportSecurity;
 + (BOOL)advertisingTrackingEnabled;
 
 @end
@@ -61,7 +64,8 @@ static NSInteger const kAdSequenceNone = -1;
             versionParameterName:@"nv"
                          version:MP_SDK_VERSION
                          testing:testing
-                   desiredAssets:nil];
+                   desiredAssets:nil
+                     viewability:YES];
 }
 
 + (NSURL *)URLWithAdUnitID:(NSString *)adUnitID
@@ -71,6 +75,7 @@ static NSInteger const kAdSequenceNone = -1;
                    version:(NSString *)version
                    testing:(BOOL)testing
              desiredAssets:(NSArray *)assets
+               viewability:(BOOL)viewability
 {
 
 
@@ -81,7 +86,8 @@ static NSInteger const kAdSequenceNone = -1;
                          version:version
                          testing:testing
                    desiredAssets:assets
-                      adSequence:kAdSequenceNone];
+                      adSequence:kAdSequenceNone
+                     viewability:viewability];
 }
 
 + (NSURL *)URLWithAdUnitID:(NSString *)adUnitID
@@ -92,6 +98,7 @@ static NSInteger const kAdSequenceNone = -1;
                    testing:(BOOL)testing
              desiredAssets:(NSArray *)assets
                 adSequence:(NSInteger)adSequence
+               viewability:(BOOL)viewability
 {
     NSString *URLString = [NSString stringWithFormat:@"%@?v=%@&udid=%@&id=%@&%@=%@",
                            [MPAPIEndpoints baseURLStringWithPath:MOPUB_API_PATH_AD_REQUEST testing:testing],
@@ -118,6 +125,11 @@ static NSInteger const kAdSequenceNone = -1;
     URLString = [URLString stringByAppendingString:[self queryParameterForAdSequence:adSequence]];
     URLString = [URLString stringByAppendingString:[self queryParameterForPhysicalScreenSize]];
     URLString = [URLString stringByAppendingString:[self queryParameterForBundleIdentifier]];
+    URLString = [URLString stringByAppendingString:[self queryParameterForAppTransportSecurity]];
+
+    if (viewability) {
+        URLString = [URLString stringByAppendingString:[self queryParameterForViewability]];
+    }
 
     return [NSURL URLWithString:URLString];
 }
@@ -289,6 +301,15 @@ static NSInteger const kAdSequenceNone = -1;
 {
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     return bundleIdentifier ? [NSString stringWithFormat:@"&bundle=%@", [bundleIdentifier mp_URLEncodedString]] : @"";
+}
+
++ (NSString *)queryParameterForAppTransportSecurity
+{
+    return [NSString stringWithFormat:@"&ats=%@", @([[MPCoreInstanceProvider sharedProvider] appTransportSecuritySettings])];
+}
+
++ (NSString *)queryParameterForViewability {
+    return [NSString stringWithFormat:@"&vv=%d", (int)[MPViewabilityTracker enabledViewabilityVendors]];
 }
 
 + (BOOL)advertisingTrackingEnabled

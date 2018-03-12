@@ -10,13 +10,17 @@
 #import "MPRewardedVideoAdManager.h"
 #import "MPInstanceProvider.h"
 #import "MPRewardedVideoError.h"
+#import "MPRewardedVideoConnection.h"
+#import "MPRewardedVideoCustomEvent.h"
+#import "MPRewardedVideoCustomEvent+Caching.h"
 
 static MPRewardedVideo *gSharedInstance = nil;
 
-@interface MPRewardedVideo () <MPRewardedVideoAdManagerDelegate>
+@interface MPRewardedVideo () <MPRewardedVideoAdManagerDelegate, MPRewardedVideoConnectionDelegate>
 
 @property (nonatomic, strong) NSMutableDictionary *rewardedVideoAdManagers;
 @property (nonatomic, weak) id<MPRewardedVideoDelegate> delegate;
+@property (nonatomic) NSMutableArray *rewardedVideoConnections;
 
 + (MPRewardedVideo *)sharedInstance;
 
@@ -28,9 +32,48 @@ static MPRewardedVideo *gSharedInstance = nil;
 {
     if (self = [super init]) {
         _rewardedVideoAdManagers = [[NSMutableDictionary alloc] init];
+        _rewardedVideoConnections = [NSMutableArray new];
     }
 
     return self;
+}
+
++ (void)initializeWithOrder:(NSArray<NSString *> *)rewardedNetworks
+{
+    // Nothing to initialize
+    if (rewardedNetworks.count == 0) {
+        return;
+    }
+
+    // Weed out any duplicate networks while preserving initialization order.
+    NSOrderedSet * orderedNetworks = [NSOrderedSet orderedSetWithArray:rewardedNetworks];
+
+    @synchronized (self) {
+        // Grab a reference to the `MPRewardedVideoCustomEvent` class since
+        // we will be using it for comparisons.
+        Class baseClass = [MPRewardedVideoCustomEvent class];
+
+        // Iterates over all of the rewarded networks and attempt to
+        // retrieve the rewarded class object if it exists in the
+        // runtime.
+        // Before using the class, the following checks are performed:
+        // 1. The class is not `nil`
+        // 2. The class is a subclass of `MPRewardedVideoCustomEvent`
+        for (NSString * network in orderedNetworks) {
+            Class networkClass = NSClassFromString(network);
+
+            if (networkClass != Nil && [networkClass isSubclassOfClass:baseClass]) {
+                NSDictionary * parameters = [MPRewardedVideoCustomEvent cachedInitializationParametersForNetwork:network];
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    MPRewardedVideoCustomEvent * networkCustomEvent = (MPRewardedVideoCustomEvent *)[networkClass new];
+                    [networkCustomEvent initializeSdkWithParameters:parameters];
+
+                    MPLogInfo(@"Loaded %@", network);
+                });
+            }
+        }
+    } // End sychronized
 }
 
 + (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID withMediationSettings:(NSArray *)mediationSettings
@@ -39,6 +82,11 @@ static MPRewardedVideo *gSharedInstance = nil;
 }
 
 + (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID keywords:(NSString *)keywords location:(CLLocation *)location mediationSettings:(NSArray *)mediationSettings
+{
+    [self loadRewardedVideoAdWithAdUnitID:adUnitID keywords:keywords location:location customerId:nil mediationSettings:mediationSettings];
+}
+
++ (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID keywords:(NSString *)keywords location:(CLLocation *)location customerId:(NSString *)customerId mediationSettings:(NSArray *)mediationSettings
 {
     MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
 
@@ -57,7 +105,7 @@ static MPRewardedVideo *gSharedInstance = nil;
 
     adManager.mediationSettings = mediationSettings;
 
-    [adManager loadRewardedVideoAdWithKeywords:keywords location:location];
+    [adManager loadRewardedVideoAdWithKeywords:keywords location:location customerId:customerId];
 }
 
 + (BOOL)hasAdAvailableForAdUnitID:(NSString *)adUnitID
@@ -68,7 +116,23 @@ static MPRewardedVideo *gSharedInstance = nil;
     return [adManager hasAdAvailable];
 }
 
-+ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController
++ (NSArray *)availableRewardsForAdUnitID:(NSString *)adUnitID
+{
+    MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
+    MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
+
+    return adManager.availableRewards;
+}
+
++ (MPRewardedVideoReward *)selectedRewardForAdUnitID:(NSString *)adUnitID
+{
+    MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
+    MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
+
+    return adManager.selectedReward;
+}
+
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward customData:(NSString *)customData
 {
     MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
     MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
@@ -91,7 +155,17 @@ static MPRewardedVideo *gSharedInstance = nil;
         MPLogWarn(@"Attempting to present a rewarded video ad in non-key window. The ad may not render properly.");
     }
 
-    [adManager presentRewardedVideoAdFromViewController:viewController];
+    [adManager presentRewardedVideoAdFromViewController:viewController withReward:reward customData:customData];
+}
+
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward
+{
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitID fromViewController:viewController withReward:reward customData:nil];
+}
+
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController
+{
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitID fromViewController:viewController withReward:nil customData:nil];
 }
 
 #pragma mark - Private
@@ -210,6 +284,22 @@ static MPRewardedVideo *gSharedInstance = nil;
     if ([self.delegate respondsToSelector:@selector(rewardedVideoAdShouldRewardForAdUnitID:reward:)]) {
         [self.delegate rewardedVideoAdShouldRewardForAdUnitID:manager.adUnitID reward:reward];
     }
+}
+
+#pragma mark - rewarded video server to server callback
+
+- (void)startRewardedVideoConnectionWithUrl:(NSURL *)url
+{
+    MPRewardedVideoConnection *connection = [[MPRewardedVideoConnection alloc] initWithUrl:url delegate:self];
+    [self.rewardedVideoConnections addObject:connection];
+    [connection sendRewardedVideoCompletionRequest];
+}
+
+#pragma mark - MPRewardedVideoConnectionDelegate
+
+- (void)rewardedVideoConnectionCompleted:(MPRewardedVideoConnection *)connection url:(NSURL *)url
+{
+    [self.rewardedVideoConnections removeObject:connection];
 }
 
 @end

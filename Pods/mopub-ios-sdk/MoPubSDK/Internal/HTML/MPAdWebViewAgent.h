@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MPAdDestinationDisplayAgent.h"
+#import "MPWebView.h"
 
 enum {
     MPAdWebViewEventAdDidAppear     = 0,
@@ -17,13 +18,15 @@ typedef NSUInteger MPAdWebViewEvent;
 @protocol MPAdWebViewAgentDelegate;
 
 @class MPAdConfiguration;
-@class MPAdWebView;
 @class CLLocation;
+@class MPViewabilityTracker;
 
-@interface MPAdWebViewAgent : NSObject <UIWebViewDelegate, MPAdDestinationDisplayAgentDelegate>
+@interface MPAdWebViewAgent : NSObject <MPWebViewDelegate, MPAdDestinationDisplayAgentDelegate>
 
-@property (nonatomic, strong) MPAdWebView *view;
+@property (nonatomic, strong) MPWebView *view;
 @property (nonatomic, weak) id<MPAdWebViewAgentDelegate> delegate;
+
+@property (nonatomic, strong, readonly) MPViewabilityTracker *viewabilityTracker;
 
 - (id)initWithAdWebViewFrame:(CGRect)frame delegate:(id<MPAdWebViewAgentDelegate>)delegate;
 - (void)loadConfiguration:(MPAdConfiguration *)configuration;
@@ -34,20 +37,20 @@ typedef NSUInteger MPAdWebViewEvent;
 - (void)enableRequestHandling;
 - (void)disableRequestHandling;
 
-@end
+- (void)startViewabilityTracker;
 
-@class MPAdWebView;
+@end
 
 @protocol MPAdWebViewAgentDelegate <NSObject>
 
 - (NSString *)adUnitId;
 - (CLLocation *)location;
 - (UIViewController *)viewControllerForPresentingModalView;
-- (void)adDidClose:(MPAdWebView *)ad;
-- (void)adDidFinishLoadingAd:(MPAdWebView *)ad;
-- (void)adDidFailToLoadAd:(MPAdWebView *)ad;
-- (void)adActionWillBegin:(MPAdWebView *)ad;
-- (void)adActionWillLeaveApplication:(MPAdWebView *)ad;
-- (void)adActionDidFinish:(MPAdWebView *)ad;
+- (void)adDidClose:(MPWebView *)ad;
+- (void)adDidFinishLoadingAd:(MPWebView *)ad;
+- (void)adDidFailToLoadAd:(MPWebView *)ad;
+- (void)adActionWillBegin:(MPWebView *)ad;
+- (void)adActionWillLeaveApplication:(MPWebView *)ad;
+- (void)adActionDidFinish:(MPWebView *)ad;
 
 @end

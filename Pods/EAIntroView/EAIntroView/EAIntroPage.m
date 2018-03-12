@@ -1,7 +1,7 @@
 //
 //  EAIntroPage.m
 //
-//  Copyright (c) 2013-2015 Evgeny Aleksandrov. License: MIT.
+//  Copyright (c) 2013-2017 Evgeny Aleksandrov. License: MIT.
 
 #import "EAIntroPage.h"
 
@@ -32,9 +32,11 @@
         _title = @"";
         _titleFont = DEFAULT_TITLE_FONT;
         _titleColor = DEFAULT_LABEL_COLOR;
+        _titleAlignment = NSTextAlignmentCenter;
         _desc = @"";
         _descFont = DEFAULT_DESCRIPTION_FONT;
         _descColor = DEFAULT_LABEL_COLOR;
+        _descAlignment = NSTextAlignmentCenter;
         _bgColor = DEFAULT_BG_COLOR;
         _showTitleView = YES;
         _alpha = 1.f;

@@ -78,7 +78,8 @@
                                     versionParameterName:@"nsv"
                                                  version:MP_SDK_VERSION
                                                  testing:NO
-                                           desiredAssets:[self.targeting.desiredAssets allObjects]];
+                                           desiredAssets:[self.targeting.desiredAssets allObjects]
+                                             viewability:NO];
 
         [self assignCompletionHandler:handler];
 
@@ -98,7 +99,8 @@
                                                  version:MP_SDK_VERSION
                                                  testing:NO
                                            desiredAssets:[self.targeting.desiredAssets allObjects]
-                                              adSequence:adSequence];
+                                              adSequence:adSequence
+                                             viewability:NO];
 
         [self assignCompletionHandler:handler];
 
@@ -151,16 +153,19 @@
                                                                    clearNullObjects:YES
                                                                               error:&error];
         if (configuration.customEventClass == [MOPUBNativeVideoCustomEvent class]) {
-            [classData setObject:[[MOPUBNativeVideoAdConfigValues alloc]
-                                  initWithPlayVisiblePercent:configuration.nativeVideoPlayVisiblePercent
-                                  pauseVisiblePercent:configuration.nativeVideoPauseVisiblePercent
-                                  impressionMinVisiblePercent:configuration.nativeVideoImpressionMinVisiblePercent
-                                  impressionVisible:configuration.nativeVideoImpressionVisible
-                                  maxBufferingTime:configuration.nativeVideoMaxBufferingTime]
-                          forKey:kNativeVideoAdConfigKey];
-            MPAdConfigurationLogEventProperties *logEventProperties =
-                [[MPAdConfigurationLogEventProperties alloc] initWithConfiguration:configuration];
+            classData[kNativeAdConfigKey] = [[MOPUBNativeVideoAdConfigValues alloc] initWithPlayVisiblePercent:configuration.nativeVideoPlayVisiblePercent
+                                                                                           pauseVisiblePercent:configuration.nativeVideoPauseVisiblePercent
+                                                                                    impressionMinVisiblePixels:configuration.nativeImpressionMinVisiblePixels
+                                                                                   impressionMinVisiblePercent:configuration.nativeImpressionMinVisiblePercent
+                                                                                   impressionMinVisibleSeconds:configuration.nativeImpressionMinVisibleTimeInterval
+                                                                                              maxBufferingTime:configuration.nativeVideoMaxBufferingTime
+                                                                                                      trackers:configuration.nativeVideoTrackers];
+            MPAdConfigurationLogEventProperties *logEventProperties = [[MPAdConfigurationLogEventProperties alloc] initWithConfiguration:configuration];
             [classData setObject:logEventProperties forKey:kLogEventRequestPropertiesKey];
+        } else if (configuration.customEventClass == [MPMoPubNativeCustomEvent class]) {
+            classData[kNativeAdConfigKey] = [[MPNativeAdConfigValues alloc] initWithImpressionMinVisiblePixels:configuration.nativeImpressionMinVisiblePixels
+                                                                                   impressionMinVisiblePercent:configuration.nativeImpressionMinVisiblePercent
+                                                                                   impressionMinVisibleSeconds:configuration.nativeImpressionMinVisibleTimeInterval];
         }
 
         configuration.customEventClassData = classData;

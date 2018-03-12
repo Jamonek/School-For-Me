@@ -24,6 +24,8 @@
 #import "UIWebView+MPAdditions.h"
 #import "MPForceableOrientationProtocol.h"
 #import "MPAPIEndPoints.h"
+#import "MoPub.h"
+#import "MPViewabilityTracker.h"
 
 static const NSTimeInterval kAdPropertyUpdateTimerInterval = 1.0;
 static const NSTimeInterval kMRAIDResizeAnimationTimeInterval = 0.3;
@@ -50,6 +52,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
 @property (nonatomic, assign) CGSize currentAdSize;
 @property (nonatomic, assign) NSUInteger modalViewCount;
 @property (nonatomic, assign) MRAdViewState currentState;
+@property (nonatomic, assign) BOOL shouldUseUIWebView;
 // Track the original super view for when we move the ad view to the key window for a 1-part expand.
 @property (nonatomic, weak) UIView *originalSuperview;
 @property (nonatomic, assign) BOOL isViewable;
@@ -72,7 +75,10 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 @property (nonatomic, assign) UIInterfaceOrientation currentInterfaceOrientation;
 
-@property (nonatomic, copy) void (^forceOrientationAfterAnimationBlock)();
+@property (nonatomic, copy) void (^forceOrientationAfterAnimationBlock)(void);
+
+@property (nonatomic, readwrite) MPViewabilityTracker *viewabilityTracker;
+@property (nonatomic, readwrite) MPWebView *mraidWebView;
 
 @end
 
@@ -106,14 +112,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
         _resizeBackgroundView = [[UIView alloc] initWithFrame:adViewFrame];
         _resizeBackgroundView.backgroundColor = [UIColor clearColor];
 
-        UIWebView *webView = [self buildMRAIDWebViewWithFrame:adViewFrame];
-
-        _mraidBridge = [[MPInstanceProvider sharedProvider] buildMRBridgeWithWebView:webView delegate:self];
         _destinationDisplayAgent = [[MPCoreInstanceProvider sharedProvider] buildMPAdDestinationDisplayAgentWithDelegate:self];
-        _mraidAdView = [[MPInstanceProvider sharedProvider] buildMRAIDMPClosableViewWithFrame:adViewFrame webView:webView delegate:self];
-        if (placementType == MRAdViewPlacementTypeInterstitial) {
-            _mraidAdView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        }
 
         _adAlertManager = [[MPCoreInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
         _adAlertManagerTwoPart = [[MPCoreInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
@@ -124,6 +123,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 - (void)dealloc
 {
+    [self.viewabilityTracker stopTracking];
+
     // Transfer delegation to the expand modal view controller in the event the modal is still being presented so it can dismiss itself.
     _expansionContentView.delegate = _expandModalViewController;
 
@@ -139,6 +140,18 @@ static NSString *const kMRAIDCommandResize = @"resize";
     self.isAdLoading = YES;
     self.adRequiresPrecaching = configuration.precacheRequired;
     self.isAdVastVideoPlayer = configuration.isVastVideoPlayer;
+    self.shouldUseUIWebView = self.isAdVastVideoPlayer;
+
+    self.mraidWebView = [self buildMRAIDWebViewWithFrame:self.mraidDefaultAdFrame
+                                          forceUIWebView:self.shouldUseUIWebView];
+
+    self.mraidBridge = [[MPInstanceProvider sharedProvider] buildMRBridgeWithWebView:self.mraidWebView delegate:self];
+    self.mraidAdView = [[MPInstanceProvider sharedProvider] buildMRAIDMPClosableViewWithFrame:self.mraidDefaultAdFrame
+                                                                                      webView:self.mraidWebView
+                                                                                     delegate:self];
+    if (self.placementType == MRAdViewPlacementTypeInterstitial) {
+        self.mraidAdView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    }
 
     [self initAdAlertManager:self.adAlertManager forAdView:self.mraidAdView];
 
@@ -149,11 +162,14 @@ static NSString *const kMRAIDCommandResize = @"resize";
         self.mraidAdView.closeButtonType = MPClosableViewCloseButtonTypeTappableWithImage;
     }
 
+    [self init3rdPartyViewabilityTrackers];
+
     // This load is guaranteed to never be called for a two-part expand so we know we need to load the HTML into the default web view.
     NSString *HTML = [configuration adResponseHTMLString];
     [self.mraidBridge loadHTMLString:HTML
                              baseURL:[NSURL URLWithString:[MPAPIEndpoints baseURL]]
      ];
+
 }
 
 - (void)handleMRAIDInterstitialDidPresentWithViewController:(MPMRAIDInterstitialViewController *)viewController
@@ -161,6 +177,13 @@ static NSString *const kMRAIDCommandResize = @"resize";
     self.interstitialViewController = viewController;
     [self enableRequestHandling];
     [self checkViewability];
+
+    // If viewability tracking has been deferred (i.e., if this is a non-banner ad), start tracking here now that the
+    // ad has been presented. If viewability tracking was not deferred, we're already tracking and there's no need to
+    // call start tracking.
+    if (![self shouldStartViewabilityDuringInitialization]) {
+        [self.viewabilityTracker startTracking];
+    }
 }
 
 - (void)enableRequestHandling
@@ -225,6 +248,31 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 #pragma mark - Private
 
+- (void)init3rdPartyViewabilityTrackers
+{
+    self.viewabilityTracker = [[MPViewabilityTracker alloc]
+                               initWithAdView:self.mraidWebView
+                               isVideo:self.isAdVastVideoPlayer
+                               startTrackingImmediately:[self shouldStartViewabilityDuringInitialization]];
+    [self.viewabilityTracker registerFriendlyObstructionView:self.mraidAdView.closeButton];
+}
+
+- (BOOL)shouldStartViewabilityDuringInitialization
+{
+    // If viewabile impression tracking experiment is enabled, we defer viewability trackers until
+    // ad view is at least x pixels on screen for y seconds, where x and y are configurable values defined in server.
+    if (self.adConfiguration.visibleImpressionTrackingEnabled) {
+        return NO;
+    }
+
+    return ![self isInterstitialAd];
+}
+
+- (BOOL)isInterstitialAd
+{
+    return (self.placementType == MRAdViewPlacementTypeInterstitial);
+}
+
 - (void)initAdAlertManager:(id<MPAdAlertManagerProtocol>)adAlertManager forAdView:(MPClosableView *)adView
 {
     adAlertManager.adConfiguration = [self.delegate adConfiguration];
@@ -267,22 +315,14 @@ static NSString *const kMRAIDCommandResize = @"resize";
     return bridge;
 }
 
-- (UIWebView *)buildMRAIDWebViewWithFrame:(CGRect)frame
+- (MPWebView *)buildMRAIDWebViewWithFrame:(CGRect)frame forceUIWebView:(BOOL)forceUIWebView
 {
-    UIWebView *webView = [[MPInstanceProvider sharedProvider] buildUIWebViewWithFrame:frame];
+    MPWebView *webView = [[MPWebView alloc] initWithFrame:frame forceUIWebView:forceUIWebView];
     webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     webView.backgroundColor = [UIColor clearColor];
     webView.clipsToBounds = YES;
     webView.opaque = NO;
     [webView mp_setScrollable:NO];
-
-    if ([webView respondsToSelector:@selector(setAllowsInlineMediaPlayback:)]) {
-        [webView setAllowsInlineMediaPlayback:YES];
-    }
-
-    if ([webView respondsToSelector:@selector(setMediaPlaybackRequiresUserAction:)]) {
-        [webView setMediaPlaybackRequiresUserAction:NO];
-    }
 
     return webView;
 }
@@ -439,7 +479,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
     [self presentExpandModalViewControllerWithView:view animated:animated completion:nil];
 }
 
-- (void)presentExpandModalViewControllerWithView:(MPClosableView *)view animated:(BOOL)animated completion:(void (^)())completionBlock
+- (void)presentExpandModalViewControllerWithView:(MPClosableView *)view animated:(BOOL)animated completion:(void (^)(void))completionBlock
 {
     [self willBeginAnimatingAdSize];
 
@@ -609,7 +649,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
     [self adDidDismissModalView];
 }
 
-- (void)bridge:(MRBridge *)bridge didFinishLoadingWebView:(UIWebView *)webView
+- (void)bridge:(MRBridge *)bridge didFinishLoadingWebView:(MPWebView *)webView
 {
     // Loading an iframe can cause this method to execute and could potentially cause us to initialize the javascript for a two-part expand
     // and fire the ready event more than once. The isAdLoading flags helps us prevent that from happening.
@@ -641,7 +681,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
     }
 }
 
-- (void)bridge:(MRBridge *)bridge didFailLoadingWebView:(UIWebView *)webView error:(NSError *)error
+- (void)bridge:(MRBridge *)bridge didFailLoadingWebView:(MPWebView *)webView error:(NSError *)error
 {
     self.isAdLoading = NO;
 
@@ -807,7 +847,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
         // It doesn't matter what frame we use for the two-part expand. We'll overwrite it with a new frame when presenting the modal.
         CGRect twoPartFrame = self.mraidAdView.frame;
 
-        UIWebView *twoPartWebView = [self buildMRAIDWebViewWithFrame:twoPartFrame];
+        MPWebView *twoPartWebView = [self buildMRAIDWebViewWithFrame:twoPartFrame forceUIWebView:self.shouldUseUIWebView];
         self.mraidBridgeTwoPart = [[MPInstanceProvider sharedProvider] buildMRBridgeWithWebView:twoPartWebView delegate:self];
         self.mraidAdViewTwoPart = [[MPInstanceProvider sharedProvider] buildMRAIDMPClosableViewWithFrame:twoPartFrame webView:twoPartWebView delegate:self];
         self.isAdLoading = YES;

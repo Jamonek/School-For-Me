@@ -5,22 +5,34 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#if __has_include("MPStaticNativeAdView.h")
-    #import "MPStaticNativeAdView.h"
-#endif
+#import "MPConstants.h"
 
-#if __has_include("MPVideoNativeAdView.h")
-    #import "MPVideoNativeAdView.h"
-#endif
-
+#import "MOPUBDisplayAgentType.h"
 #import "MPAdConversionTracker.h"
 #import "MPAdView.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerCustomEventDelegate.h"
-#import "MPConstants.h"
+#import "MPGlobal.h"
+#import "MPIdentityProvider.h"
 #import "MPInterstitialAdController.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPInterstitialCustomEventDelegate.h"
+#import "MPLogging.h"
+#import "MPLogEvent.h"
+#import "MPLogEventRecorder.h"
+#import "MPLogLevel.h"
+#import "MPLogProvider.h"
+#import "MPMediationSettingsProtocol.h"
+#import "MPRewardedVideo.h"
+#import "MPRewardedVideoNetwork.h"
+#import "MPRewardedVideoReward.h"
+#import "MPRewardedVideoCustomEvent.h"
+#import "MPRewardedVideoCustomEvent+Caching.h"
+#import "MPRewardedVideoError.h"
+#import "MPViewabilityAdapter.h"
+#import "MPViewabilityOption.h"
+
+#if MP_HAS_NATIVE_PACKAGE
 #import "MPNativeAd.h"
 #import "MPNativeAdAdapter.h"
 #import "MPNativeAdConstants.h"
@@ -35,11 +47,6 @@
 #import "MPClientAdPositioning.h"
 #import "MPServerAdPositioning.h"
 #import "MPNativeAdDelegate.h"
-#import "MPMediationSettingsProtocol.h"
-#import "MPRewardedVideo.h"
-#import "MPRewardedVideoReward.h"
-#import "MPRewardedVideoCustomEvent.h"
-#import "MPRewardedVideoError.h"
 #import "MPStaticNativeAdRendererSettings.h"
 #import "MPNativeAdRendererConfiguration.h"
 #import "MPNativeAdRendererSettings.h"
@@ -48,6 +55,8 @@
 #import "MOPUBNativeVideoAdRendererSettings.h"
 #import "MOPUBNativeVideoAdRenderer.h"
 #import "MPNativeAdRenderingImageLoader.h"
+#import "MPStreamAdPlacer.h"
+#endif
 
 // Import these frameworks for module support.
 #import <AdSupport/AdSupport.h>
@@ -55,8 +64,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <EventKit/EventKit.h>
-#import <EventKitUI/EventKitUI.h>
 #import <Foundation/Foundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <MessageUI/MessageUI.h>
@@ -85,26 +92,64 @@
  * This only occurs if location services are enabled and the user has already authorized the use
  * of location services for the application. The default value is YES.
  *
- * @param enabled A Boolean value indicating whether the SDK should listen for location updates.
+ * @return A Boolean value indicating whether the SDK should listen for location updates.
  */
 @property (nonatomic, assign) BOOL locationUpdatesEnabled;
 
+
+/**
+ * A Boolean value indicating whether the MoPub SDK should create a MoPub ID that can be used
+ * for frequency capping when Limit ad tracking is on & the IDFA we get is
+ * 00000000-0000-0000-0000-000000000000.
+ *
+ * When set to NO, the SDK will not create a MoPub ID in the above case. When set to YES, the
+ * SDK will generate a MoPub ID. The default value is YES.
+ *
+ */
+@property (nonatomic) BOOL frequencyCappingIdUsageEnabled;
+
+/**
+ * Forces the usage of WKWebView (if able).
+ */
+@property (nonatomic, assign) BOOL forceWKWebView;
+
+/**
+ * SDK log level. The default value is `MPLogLevelInfo`.
+ */
+@property (nonatomic, assign) MPLogLevel logLevel;
+
 /** @name Rewarded Video */
 /**
- * Initializes the rewarded video system.
+ * Initializes the rewarded video system and preinitializes all cached rewarded video network SDKs.
  *
  * This method should only be called once. It should also be called prior to requesting any rewarded video ads.
- * Once the global mediation settings and delegate are set, they cannot be changed.
+ * Once the global mediation settings and delegate are set, they cannot be changed for the rest of the app session.
  *
  * @param globalMediationSettings Global configurations for all rewarded video ad networks your app supports.
- *
  * @param delegate The delegate that will receive all events related to rewarded video.
  */
-- (void)initializeRewardedVideoWithGlobalMediationSettings:(NSArray *)globalMediationSettings delegate:(id<MPRewardedVideoDelegate>)delegate;
+- (void)initializeRewardedVideoWithGlobalMediationSettings:(NSArray *)globalMediationSettings
+                                                  delegate:(id<MPRewardedVideoDelegate>)delegate;
+
+/** @name Rewarded Video */
+/**
+ * Initializes the rewarded video system and preinitializes all specified rewarded video network SDKs.
+ *
+ * This method should only be called once at app launch, prior to requesting any rewarded video ads.
+ * Once the global mediation settings and delegate are set, they cannot be changed the rest of the app session.
+ *
+ * @param globalMediationSettings Global configurations for all rewarded video ad networks your app supports.
+ * @param delegate The delegate that will receive all events related to rewarded video.
+ * @param order An array of rewarded video custom event networks to preinitialize. For convenience, use
+ * the constants from `MPRewardedVideoNetwork`. If `nil` is passed in, no network SDKs will be preinitialized.
+ */
+- (void)initializeRewardedVideoWithGlobalMediationSettings:(NSArray *)globalMediationSettings
+                                                  delegate:(id<MPRewardedVideoDelegate>)delegate
+                                networkInitializationOrder:(NSArray<NSString *> *)order;
 
 /**
  * Retrieves the global mediation settings for a given class type.
-*
+ *
  * @param aClass The type of mediation settings object you want to receive from the collection.
  */
 - (id<MPMediationSettingsProtocol>)globalMediationSettingsForClass:(Class)aClass;
@@ -112,5 +157,24 @@
 - (void)start;
 - (NSString *)version;
 - (NSString *)bundleIdentifier;
+
+/**
+ * Default is MOPUBDisplayAgentTypeInApp = 0.
+ *
+ * If displayType is set to MOPUBDisplayAgentTypeNativeSafari = 1, http/https clickthrough URLs are opened in native
+ * safari browser.
+ * If displayType is set to MOPUBDisplayAgentTypeSafariViewController = 2, http/https clickthrough URLs are opened in
+ * SafariViewController.
+ *
+ */
+- (void)setClickthroughDisplayAgentType:(MOPUBDisplayAgentType)displayAgentType;
+
+/**
+ * Disables viewability measurement via the specified vendor(s) for the rest of the app session. A given vendor cannot
+ * be re-enabled after being disabled.
+ *
+ * @param vendors The viewability vendor(s) to be disabled. This is a bitmask value; ORing vendors together is okay.
+ */
+- (void)disableViewability:(MPViewabilityOption)vendors;
 
 @end

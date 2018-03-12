@@ -12,7 +12,7 @@
 #import "MPAdDestinationDisplayAgent.h"
 #import "NSURL+MPAdditions.h"
 #import "UIWebView+MPAdditions.h"
-#import "MPAdWebView.h"
+#import "MPWebView.h"
 #import "MPInstanceProvider.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPUserInteractionGestureRecognizer.h"
@@ -20,6 +20,9 @@
 #import "NSURL+MPAdditions.h"
 #import "MPInternalUtils.h"
 #import "MPAPIEndPoints.h"
+#import "MoPub.h"
+#import "MPViewabilityTracker.h"
+#import "NSString+MPAdditions.h"
 
 #ifndef NSFoundationVersionNumber_iOS_6_1
 #define NSFoundationVersionNumber_iOS_6_1 993.00
@@ -35,6 +38,8 @@
 @property (nonatomic, strong) id<MPAdAlertManagerProtocol> adAlertManager;
 @property (nonatomic, assign) BOOL userInteractedWithWebView;
 @property (nonatomic, strong) MPUserInteractionGestureRecognizer *userInteractionRecognizer;
+@property (nonatomic, assign) CGRect frame;
+@property (nonatomic, strong, readwrite) MPViewabilityTracker *viewabilityTracker;
 
 - (void)performActionForMoPubSpecificURL:(NSURL *)URL;
 - (BOOL)shouldIntercept:(NSURL *)URL navigationType:(UIWebViewNavigationType)navigationType;
@@ -57,7 +62,8 @@
 {
     self = [super init];
     if (self) {
-        self.view = [[MPInstanceProvider sharedProvider] buildMPAdWebViewWithFrame:frame delegate:self];
+        _frame = frame;
+
         self.destinationDisplayAgent = [[MPCoreInstanceProvider sharedProvider] buildMPAdDestinationDisplayAgentWithDelegate:self];
         self.delegate = delegate;
         self.shouldHandleRequests = YES;
@@ -65,7 +71,6 @@
 
         self.userInteractionRecognizer = [[MPUserInteractionGestureRecognizer alloc] initWithTarget:self action:@selector(handleInteraction:)];
         self.userInteractionRecognizer.cancelsTouchesInView = NO;
-        [self.view addGestureRecognizer:self.userInteractionRecognizer];
         self.userInteractionRecognizer.delegate = self;
     }
     return self;
@@ -73,6 +78,7 @@
 
 - (void)dealloc
 {
+    [self.viewabilityTracker stopTracking];
     self.userInteractionRecognizer.delegate = nil;
     [self.userInteractionRecognizer removeTarget:self action:nil];
     [self.destinationDisplayAgent cancel];
@@ -112,6 +118,16 @@
 {
     self.configuration = configuration;
 
+    // Initialize web view
+    if (self.view != nil) {
+        self.view.delegate = nil;
+        [self.view removeFromSuperview];
+        self.view = nil;
+    }
+    self.view = [[MPWebView alloc] initWithFrame:self.frame];
+    self.view.delegate = self;
+    [self.view addGestureRecognizer:self.userInteractionRecognizer];
+
     // Ignore server configuration size for interstitials. At this point our web view
     // is sized correctly for the device's screen. Currently the server sends down values for a 3.5in
     // screen, and they do not size correctly on a 4in screen.
@@ -124,14 +140,11 @@
         }
     }
 
-    // excuse interstitials from user tapped check since it's already a takeover experience
-    // and certain videos may delay tap gesture recognition
-    if (configuration.adType == MPAdTypeInterstitial) {
-        self.userInteractedWithWebView = YES;
-    }
-
     [self.view mp_setScrollable:configuration.scrollable];
     [self.view disableJavaScriptDialogs];
+
+    // Initialize viewability trackers before loading self.view
+    [self init3rdPartyViewabilityTrackers];
 
     [self.view loadHTMLString:[configuration adResponseHTMLString]
                       baseURL:[NSURL URLWithString:[MPAPIEndpoints baseURL]]
@@ -144,6 +157,12 @@
 {
     switch (event) {
         case MPAdWebViewEventAdDidAppear:
+            // For banner, viewability tracker is handled right after adView is initialized (not here).
+            // For interstitial (handled here), we start tracking viewability if it's not started during adView initialization.
+            if (![self shouldStartViewabilityDuringInitialization]) {
+                [self startViewabilityTracker];
+            }
+
             [self.view stringByEvaluatingJavaScriptFromString:@"webviewDidAppear();"];
             break;
         case MPAdWebViewEventAdDidDisappear:
@@ -152,6 +171,11 @@
         default:
             break;
     }
+}
+
+- (void)startViewabilityTracker
+{
+    [self.viewabilityTracker startTracking];
 }
 
 - (void)disableRequestHandling
@@ -192,9 +216,9 @@
     return self.configuration;
 }
 
-#pragma mark - <UIWebViewDelegate>
+#pragma mark - <MPWebViewDelegate>
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
+- (BOOL)webView:(MPWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
     if (!self.shouldHandleRequests) {
@@ -206,6 +230,13 @@
         [self performActionForMoPubSpecificURL:URL];
         return NO;
     } else if ([self shouldIntercept:URL navigationType:navigationType]) {
+
+        // Disable intercept without user interaction
+        if (!self.userInteractedWithWebView) {
+            MPLogInfo(@"Redirect without user interaction detected");
+            return NO;
+        }
+
         [self interceptURL:URL];
         return NO;
     } else {
@@ -214,7 +245,7 @@
     }
 }
 
-- (void)webViewDidStartLoad:(UIWebView *)webView
+- (void)webViewDidStartLoad:(MPWebView *)webView
 {
     [self.view disableJavaScriptDialogs];
 }
@@ -249,8 +280,8 @@
         return NO;
     } else if (navigationType == UIWebViewNavigationTypeLinkClicked) {
         return YES;
-    } else if (navigationType == UIWebViewNavigationTypeOther) {
-        return [[URL absoluteString] hasPrefix:[self.configuration clickDetectionURLPrefix]];
+    } else if (navigationType == UIWebViewNavigationTypeOther && self.userInteractedWithWebView) {
+        return YES;
     } else {
         return NO;
     }
@@ -270,6 +301,27 @@
 }
 
 #pragma mark - Utility
+
+- (void)init3rdPartyViewabilityTrackers
+{
+    self.viewabilityTracker = [[MPViewabilityTracker alloc] initWithAdView:self.view isVideo:self.configuration.isVastVideoPlayer startTrackingImmediately:[self shouldStartViewabilityDuringInitialization]];
+}
+
+- (BOOL)shouldStartViewabilityDuringInitialization
+{
+    // If viewabile impression tracking experiment is enabled, we defer viewability trackers until
+    // ad view is at least x pixels on screen for y seconds, where x and y are configurable values defined in server.
+    if (self.adConfiguration.visibleImpressionTrackingEnabled) {
+        return NO;
+    }
+
+    return ![self isInterstitialAd];
+}
+
+- (BOOL)isInterstitialAd
+{
+    return (self.configuration.adType == MPAdTypeInterstitial);
+}
 
 - (void)initAdAlertManager
 {
@@ -306,15 +358,6 @@
                                         @"evt.initEvent('orientationchange',true,true);window.dispatchEvent(evt);})();",
                                         angle];
     [self.view stringByEvaluatingJavaScriptFromString:orientationEventScript];
-
-    // XXX: If the UIWebView is rotated off-screen (which may happen with interstitials), its
-    // content may render off-center upon display. We compensate by setting the viewport meta tag's
-    // 'width' attribute to be the size of the webview.
-    NSString *viewportUpdateScript = [NSString stringWithFormat:
-                                      @"document.querySelector('meta[name=viewport]')"
-                                      @".setAttribute('content', 'width=%f;', false);",
-                                      self.view.frame.size.width];
-    [self.view stringByEvaluatingJavaScriptFromString:viewportUpdateScript];
 
     // XXX: In iOS 7, off-screen UIWebViews will fail to render certain image creatives.
     // Specifically, creatives that only contain an <img> tag whose src attribute uses a 302

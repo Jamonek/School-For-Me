@@ -78,14 +78,21 @@
 - (UIView *)retrieveAdViewWithError:(NSError **)error
 {
     // We always return the same MPNativeView (self.associatedView) so we need to remove its subviews
-    // before attaching the new ad view to it.
-    [[self.associatedView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    // before attaching the new ad view to it. Also need to reset the `hasAttachedToView` state
+    // variable back to `NO` since all of the subviews should be removed.
+    for (UIView * view in self.associatedView.subviews) {
+        [view removeFromSuperview];
+    }
+
+    if (self.associatedView.subviews.count == 0) {
+        self.hasAttachedToView = NO;
+    }
 
     UIView *adView = [self.renderer retrieveViewWithAdapter:self.adAdapter error:error];
 
     if (adView) {
         if (!self.hasAttachedToView) {
-            [self willAttachToView:self.associatedView];
+            [self willAttachToView:self.associatedView withAdContentViews:adView.subviews];
             self.hasAttachedToView = YES;
         }
 
@@ -143,14 +150,18 @@
 {
     NSMutableURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:URL];
     request.cachePolicy = NSURLRequestReloadIgnoringCacheData;
-    [NSURLConnection connectionWithRequest:request delegate:nil];
+
+    NSURLConnection * connection = [[NSURLConnection alloc] initWithRequest:request delegate:nil startImmediately:NO];
+    [connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [connection start];
 }
 
 #pragma mark - Internal
 
-- (void)willAttachToView:(UIView *)view
-{
-    if ([self.adAdapter respondsToSelector:@selector(willAttachToView:)]) {
+- (void)willAttachToView:(UIView *)view withAdContentViews:(NSArray *)adContentViews {
+    if ([self.adAdapter respondsToSelector:@selector(willAttachToView:withAdContentViews:)]) {
+        [self.adAdapter willAttachToView:view withAdContentViews:adContentViews];
+    } else if ([self.adAdapter respondsToSelector:@selector(willAttachToView:)]) {
         [self.adAdapter willAttachToView:view];
     }
 }
