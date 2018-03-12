@@ -6,7 +6,7 @@
 //
 
 #import "MPInstanceProvider.h"
-#import "MPAdWebView.h"
+#import "MPWebView.h"
 #import "MPAdWebViewAgent.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialCustomEventAdapter.h"
@@ -18,19 +18,9 @@
 #import "MPBannerCustomEvent.h"
 #import "MPBannerAdManager.h"
 #import "MPLogging.h"
-#import "MRImageDownloader.h"
 #import "MRBundleManager.h"
-#import "MRCalendarManager.h"
-#import "MRPictureManager.h"
 #import "MRVideoPlayerManager.h"
-#import <EventKit/EventKit.h>
-#import <EventKitUI/EventKitUI.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import "MPNativeCustomEvent.h"
-#import "MPNativeAdSource.h"
-#import "MPNativePositionSource.h"
-#import "MPStreamAdPlacementData.h"
-#import "MPStreamAdPlacer.h"
 #import "MRNativeCommandHandler.h"
 #import "MRBridge.h"
 #import "MRController.h"
@@ -38,6 +28,14 @@
 #import "MPRewardedVideoAdManager.h"
 #import "MPRewardedVideoAdapter.h"
 #import "MPRewardedVideoCustomEvent.h"
+
+#if MP_HAS_NATIVE_PACKAGE
+#import "MPNativeCustomEvent.h"
+#import "MPNativeAdSource.h"
+#import "MPNativePositionSource.h"
+#import "MPStreamAdPlacementData.h"
+#import "MPStreamAdPlacer.h"
+#endif
 
 @interface MPInstanceProvider ()
 
@@ -102,35 +100,6 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return singleton;
 }
 
-#pragma mark - Banners
-
-- (MPBannerAdManager *)buildMPBannerAdManagerWithDelegate:(id<MPBannerAdManagerDelegate>)delegate
-{
-    return [(MPBannerAdManager *)[MPBannerAdManager alloc] initWithDelegate:delegate];
-}
-
-- (MPBaseBannerAdapter *)buildBannerAdapterForConfiguration:(MPAdConfiguration *)configuration
-                                                   delegate:(id<MPBannerAdapterDelegate>)delegate
-{
-    if (configuration.customEventClass) {
-        return [(MPBannerCustomEventAdapter *)[MPBannerCustomEventAdapter alloc] initWithDelegate:delegate];
-    }
-
-    return nil;
-}
-
-- (MPBannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
-                                                      delegate:(id<MPBannerCustomEventDelegate>)delegate
-{
-    MPBannerCustomEvent *customEvent = [[customClass alloc] init];
-    if (![customEvent isKindOfClass:[MPBannerCustomEvent class]]) {
-        MPLogError(@"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
-        return nil;
-    }
-    customEvent.delegate = delegate;
-    return customEvent;
-}
-
 #pragma mark - Interstitials
 
 - (MPInterstitialAdManager *)buildMPInterstitialAdManagerWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate
@@ -157,9 +126,13 @@ static MPInstanceProvider *sharedAdProvider = nil;
         MPLogError(@"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
     if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
         MPLogWarn(@"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
+#pragma clang diagnostic pop
     customEvent.delegate = delegate;
     return customEvent;
 }
@@ -208,13 +181,6 @@ static MPInstanceProvider *sharedAdProvider = nil;
 
 #pragma mark - HTML Ads
 
-- (MPAdWebView *)buildMPAdWebViewWithFrame:(CGRect)frame delegate:(id<UIWebViewDelegate>)delegate
-{
-    MPAdWebView *webView = [[MPAdWebView alloc] initWithFrame:frame];
-    webView.delegate = delegate;
-    return webView;
-}
-
 - (MPAdWebViewAgent *)buildMPAdWebViewAgentWithAdWebViewFrame:(CGRect)frame delegate:(id<MPAdWebViewAgentDelegate>)delegate
 {
     return [[MPAdWebViewAgent alloc] initWithAdWebViewFrame:frame delegate:delegate];
@@ -222,7 +188,7 @@ static MPInstanceProvider *sharedAdProvider = nil;
 
 #pragma mark - MRAID
 
-- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(UIWebView *)webView delegate:(id<MPClosableViewDelegate>)delegate
+- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(MPWebView *)webView delegate:(id<MPClosableViewDelegate>)delegate
 {
     MPClosableView *adView = [[MPClosableView alloc] initWithFrame:frame closeButtonType:MPClosableViewCloseButtonTypeTappableWithImage];
     adView.delegate = delegate;
@@ -254,45 +220,12 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return controller;
 }
 
-- (MRBridge *)buildMRBridgeWithWebView:(UIWebView *)webView delegate:(id<MRBridgeDelegate>)delegate
+- (MRBridge *)buildMRBridgeWithWebView:(MPWebView *)webView delegate:(id<MRBridgeDelegate>)delegate
 {
     MRBridge *bridge = [[MRBridge alloc] initWithWebView:webView];
     bridge.delegate = delegate;
     bridge.shouldHandleRequests = YES;
     return bridge;
-}
-
-- (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame
-{
-    return [[UIWebView alloc] initWithFrame:frame];
-}
-
-- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate
-{
-    return [[MRCalendarManager alloc] initWithDelegate:delegate];
-}
-
-- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate
-{
-    EKEventEditViewController *controller = [[EKEventEditViewController alloc] init];
-    controller.editViewDelegate = editViewDelegate;
-    controller.eventStore = [self buildEKEventStore];
-    return controller;
-}
-
-- (EKEventStore *)buildEKEventStore
-{
-    return [[EKEventStore alloc] init];
-}
-
-- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id<MRPictureManagerDelegate>)delegate
-{
-    return [[MRPictureManager alloc] initWithDelegate:delegate];
-}
-
-- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id<MRImageDownloaderDelegate>)delegate
-{
-    return [[MRImageDownloader alloc] initWithDelegate:delegate];
 }
 
 - (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id<MRVideoPlayerManagerDelegate>)delegate
@@ -317,6 +250,8 @@ static MPInstanceProvider *sharedAdProvider = nil;
 }
 
 #pragma mark - Native
+
+#if MP_HAS_NATIVE_PACKAGE
 
 - (MPNativeCustomEvent *)buildNativeCustomEventFromCustomClass:(Class)customClass
                                                       delegate:(id<MPNativeCustomEventDelegate>)delegate
@@ -352,6 +287,8 @@ static MPInstanceProvider *sharedAdProvider = nil;
 {
     return [MPStreamAdPlacer placerWithViewController:controller adPositioning:positioning rendererConfigurations:rendererConfigurations];
 }
+
+#endif
 
 @end
 

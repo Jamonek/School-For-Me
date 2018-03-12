@@ -148,6 +148,17 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
 
 #pragma mark - <UITableViewDataSource>
 
+// Default is 1 if not implemented
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if ([self.originalDataSource respondsToSelector:@selector(numberOfSectionsInTableView:)]) {
+        return [self.originalDataSource numberOfSectionsInTableView:tableView];
+    }
+    else {
+        return 1;
+    }
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     NSUInteger numberOfItems = [self.originalDataSource tableView:tableView numberOfRowsInSection:section];
@@ -797,13 +808,11 @@ static char kAdPlacerKey;
     }
 
     if (!indexPath || adjustedIndexPath) {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0
         if ([self respondsToSelector:@selector(dequeueReusableCellWithIdentifier:forIndexPath:)]) {
             return [self dequeueReusableCellWithIdentifier:identifier forIndexPath:adjustedIndexPath];
         } else {
             return [self dequeueReusableCellWithIdentifier:identifier];
         }
-#endif
     } else {
         return nil;
     }

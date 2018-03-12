@@ -23,6 +23,14 @@
 @interface MPRewardedVideo : NSObject
 
 /**
+ * Initializes the rewarded networks in order.
+ *
+ * @param rewardedNetworks An ordered array of `MPRewardedVideoNetwork` values. If the parameter is empty or `nil`,
+ * nothing will happen.
+ */
++ (void)initializeWithOrder:(NSArray<NSString *> *)rewardedNetworks;
+
+/**
  * Loads a rewarded video ad for the given ad unit ID.
  *
  * The mediation settings array should contain ad network specific objects for networks that may be loaded for the given ad unit ID.
@@ -47,11 +55,29 @@
  * @param adUnitID The ad unit ID that ads should be loaded from.
  * @param keywords A string representing a set of keywords that should be passed to the MoPub ad server to receive
  * more relevant advertising.
-  *@param location Latitude/Longitude that are passed to the MoPub ad server
+ * @param location Latitude/Longitude that are passed to the MoPub ad server
  * @param mediationSettings An array of mediation settings objects that map to networks that may show ads for the ad unit ID. This array
  * should only contain objects for networks you wish to configure. This can be nil.
  */
 + (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID keywords:(NSString *)keywords location:(CLLocation *)location mediationSettings:(NSArray *)mediationSettings;
+
+/**
+ * Loads a rewarded video ad for the given ad unit ID.
+ *
+ * The mediation settings array should contain ad network specific objects for networks that may be loaded for the given ad unit ID.
+ * You should set the properties on these objects to determine how the underlying ad network should behave. You only need to supply
+ * objects for the networks you wish to configure. If you do not want your network to behave differently from its default behavior, do
+ * not pass in an mediation settings object for that network.
+ *
+ * @param adUnitID The ad unit ID that ads should be loaded from.
+ * @param keywords A string representing a set of keywords that should be passed to the MoPub ad server to receive
+ * more relevant advertising.
+ * @param location Latitude/Longitude that are passed to the MoPub ad server
+ * @param customerId This is the ID given to the user by the publisher to identify them in their app
+ * @param mediationSettings An array of mediation settings objects that map to networks that may show ads for the ad unit ID. This array
+ * should only contain objects for networks you wish to configure. This can be nil.
+ */
++ (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID keywords:(NSString *)keywords location:(CLLocation *)location customerId:(NSString *)customerId mediationSettings:(NSArray *)mediationSettings;
 
 /**
  * Returns whether or not an ad is available for the given ad unit ID.
@@ -61,7 +87,48 @@
 + (BOOL)hasAdAvailableForAdUnitID:(NSString *)adUnitID;
 
 /**
+ * Returns an array of rewards that are available for the given ad unit ID.
+ */
++ (NSArray *)availableRewardsForAdUnitID:(NSString *)adUnitID;
+
+/**
+ * The currently selected reward that will be awarded to the user upon completion of the ad. By default,
+ * this corresponds to the first reward in `availableRewardsForAdUnitID:`.
+ */
++ (MPRewardedVideoReward *)selectedRewardForAdUnitID:(NSString *)adUnitID;
+
+/**
  * Plays a rewarded video ad.
+ *
+ * @param adUnitID The ad unit ID associated with the video ad you wish to play.
+ * @param viewController The view controller that will present the rewarded video ad.
+ * @param reward A reward selected from `availableRewardsForAdUnitID:` to award the user upon successful completion of the ad.
+ * This value should not be `nil`.
+ *
+ * @warning **Important**: You should not attempt to play the rewarded video unless `+hasAdAvailableForAdUnitID:` indicates that an
+ * ad is available for playing or you have received the `[-rewardedVideoAdDidLoadForAdUnitID:]([MPRewardedVideoDelegate rewardedVideoAdDidLoadForAdUnitID:])`
+ * message.
+ */
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward;
+
+/**
+ * Plays a rewarded video ad.
+ *
+ * @param adUnitID The ad unit ID associated with the video ad you wish to play.
+ * @param viewController The view controller that will present the rewarded video ad.
+ * @param reward A reward selected from `availableRewardsForAdUnitID:` to award the user upon successful completion of the ad.
+ * This value should not be `nil`.
+ * @param customData Optional custom data string to include in the server-to-server callback. If a server-to-server callback
+ * is not used, or if the ad unit is configured for local rewarding, this value will not be persisted.
+ *
+ * @warning **Important**: You should not attempt to play the rewarded video unless `+hasAdAvailableForAdUnitID:` indicates that an
+ * ad is available for playing or you have received the `[-rewardedVideoAdDidLoadForAdUnitID:]([MPRewardedVideoDelegate rewardedVideoAdDidLoadForAdUnitID:])`
+ * message.
+ */
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward customData:(NSString *)customData;
+
+/**
+ * Plays a rewarded video ad, automatically selecting the first available reward in `availableRewardsForAdUnitID:`.
  *
  * @param adUnitID The ad unit ID associated with the video ad you wish to play.
  * @param viewController The view controller that will present the rewarded video ad.
@@ -70,7 +137,7 @@
  * ad is available for playing or you have received the `[-rewardedVideoAdDidLoadForAdUnitID:]([MPRewardedVideoDelegate rewardedVideoAdDidLoadForAdUnitID:])`
  * message.
  */
-+ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController;
++ (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController __deprecated_msg("use presentRewardedVideoAdForAdUnitID:fromViewController:withReward: instead.");
 
 @end
 

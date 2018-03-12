@@ -40,6 +40,10 @@ extern NSString * const kPrecacheRequiredKey;
 extern NSString * const kIsVastVideoPlayerKey;
 extern NSString * const kRewardedVideoCurrencyNameHeaderKey;
 extern NSString * const kRewardedVideoCurrencyAmountHeaderKey;
+extern NSString * const kRewardedVideoCompletionUrlHeaderKey;
+extern NSString * const kRewardedCurrenciesHeaderKey;
+extern NSString * const kRewardedPlayableDurationHeaderKey;
+extern NSString * const kRewardedPlayableRewardOnClickHeaderKey;
 
 extern NSString * const kInterstitialAdTypeHeaderKey;
 extern NSString * const kOrientationTypeHeaderKey;
@@ -50,6 +54,13 @@ extern NSString * const kAdTypeMraid;
 extern NSString * const kAdTypeClear;
 extern NSString * const kAdTypeNative;
 extern NSString * const kAdTypeNativeVideo;
+
+extern NSString * const kClickthroughExperimentBrowserAgent;
+
+extern NSString * const kViewabilityDisableHeaderKey;
+
+extern NSString * const kBannerImpressionVisableMsHeaderKey;
+extern NSString * const kBannerImpressionMinPixelHeaderKey;
 
 @interface MPAdConfiguration : NSObject
 
@@ -79,10 +90,22 @@ extern NSString * const kAdTypeNativeVideo;
 @property (nonatomic, copy) NSString *headerAdType;
 @property (nonatomic, assign) NSInteger nativeVideoPlayVisiblePercent;
 @property (nonatomic, assign) NSInteger nativeVideoPauseVisiblePercent;
-@property (nonatomic, assign) NSInteger nativeVideoImpressionMinVisiblePercent;
-@property (nonatomic, assign) NSTimeInterval nativeVideoImpressionVisible;
+@property (nonatomic, assign) CGFloat nativeImpressionMinVisiblePixels;
+@property (nonatomic, assign) NSInteger nativeImpressionMinVisiblePercent; // The pixels header takes priority over percentage, but percentage is left for backwards compatibility
+@property (nonatomic, assign) NSTimeInterval nativeImpressionMinVisibleTimeInterval;
 @property (nonatomic, assign) NSTimeInterval nativeVideoMaxBufferingTime;
-@property (nonatomic) MPRewardedVideoReward *rewardedVideoReward;
+@property (nonatomic) NSDictionary *nativeVideoTrackers;
+@property (nonatomic, readonly) NSArray *availableRewards;
+@property (nonatomic, strong) MPRewardedVideoReward *selectedReward;
+@property (nonatomic, copy) NSString *rewardedVideoCompletionUrl;
+@property (nonatomic, assign) NSTimeInterval rewardedPlayableDuration;
+@property (nonatomic, assign) BOOL rewardedPlayableShouldRewardOnClick;
+
+
+// viewable impression tracking experiment
+@property (nonatomic) NSTimeInterval impressionMinVisibleTimeInSec;
+@property (nonatomic) CGFloat impressionMinVisiblePixels;
+@property (nonatomic) BOOL visibleImpressionTrackingEnabled;
 
 - (id)initWithHeaders:(NSDictionary *)headers data:(NSData *)data;
 

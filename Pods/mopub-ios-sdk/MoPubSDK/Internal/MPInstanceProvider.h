@@ -8,6 +8,10 @@
 #import "MPGlobal.h"
 #import "MPCoreInstanceProvider.h"
 
+// MPWebView
+@class MPWebView;
+@protocol MPWebViewDelegate;
+
 // Banners
 @class MPBannerAdManager;
 @protocol MPBannerAdManagerDelegate;
@@ -36,7 +40,6 @@
 @protocol MPRewardedVideoAdManagerDelegate;
 
 // HTML Ads
-@class MPAdWebView;
 @class MPAdWebViewAgent;
 @protocol MPAdWebViewAgentDelegate;
 
@@ -48,15 +51,6 @@
 @protocol MRBridgeDelegate;
 @protocol MPClosableViewDelegate;
 @class MRBundleManager;
-@class MRCalendarManager;
-@protocol MRCalendarManagerDelegate;
-@class EKEventStore;
-@class EKEventEditViewController;
-@protocol EKEventEditViewDelegate;
-@class MRPictureManager;
-@protocol MRPictureManagerDelegate;
-@class MRImageDownloader;
-@protocol MRImageDownloaderDelegate;
 @class MRVideoPlayerManager;
 @protocol MRVideoPlayerManagerDelegate;
 @class MPMoviePlayerViewController;
@@ -80,13 +74,6 @@
 - (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider;
 - (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider context:(id)context;
 
-#pragma mark - Banners
-- (MPBannerAdManager *)buildMPBannerAdManagerWithDelegate:(id<MPBannerAdManagerDelegate>)delegate;
-- (MPBaseBannerAdapter *)buildBannerAdapterForConfiguration:(MPAdConfiguration *)configuration
-                                                   delegate:(id<MPBannerAdapterDelegate>)delegate;
-- (MPBannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
-                                                      delegate:(id<MPBannerCustomEventDelegate>)delegate;
-
 #pragma mark - Interstitials
 - (MPInterstitialAdManager *)buildMPInterstitialAdManagerWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 - (MPBaseInterstitialAdapter *)buildInterstitialAdapterForConfiguration:(MPAdConfiguration *)configuration
@@ -105,23 +92,15 @@
 
 
 #pragma mark - HTML Ads
-- (MPAdWebView *)buildMPAdWebViewWithFrame:(CGRect)frame
-                                  delegate:(id<UIWebViewDelegate>)delegate;
 - (MPAdWebViewAgent *)buildMPAdWebViewAgentWithAdWebViewFrame:(CGRect)frame
                                                      delegate:(id<MPAdWebViewAgentDelegate>)delegate;
 
 #pragma mark - MRAID
-- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(UIWebView *)webView delegate:(id<MPClosableViewDelegate>)delegate;
+- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(MPWebView *)webView delegate:(id<MPClosableViewDelegate>)delegate;
 - (MRBundleManager *)buildMRBundleManager;
 - (MRController *)buildBannerMRControllerWithFrame:(CGRect)frame delegate:(id<MRControllerDelegate>)delegate;
 - (MRController *)buildInterstitialMRControllerWithFrame:(CGRect)frame delegate:(id<MRControllerDelegate>)delegate;
-- (MRBridge *)buildMRBridgeWithWebView:(UIWebView *)webView delegate:(id<MRBridgeDelegate>)delegate;
-- (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame;
-- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate;
-- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate;
-- (EKEventStore *)buildEKEventStore;
-- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id<MRPictureManagerDelegate>)delegate;
-- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id<MRImageDownloaderDelegate>)delegate;
+- (MRBridge *)buildMRBridgeWithWebView:(MPWebView *)webView delegate:(id<MRBridgeDelegate>)delegate;
 - (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id<MRVideoPlayerManagerDelegate>)delegate;
 - (MPMoviePlayerViewController *)buildMPMoviePlayerViewControllerWithURL:(NSURL *)URL;
 - (MRNativeCommandHandler *)buildMRNativeCommandHandlerWithDelegate:(id<MRNativeCommandHandlerDelegate>)delegate;

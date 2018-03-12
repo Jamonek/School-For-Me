@@ -10,18 +10,22 @@
 
 @implementation MPRewardedVideoCustomEvent
 
+- (void)initializeSdkWithParameters:(NSDictionary *)parameters
+{
+    // The default implementation of this method does nothing. Subclasses must override this method
+    // and implement code to initialize the underlying SDK here.
+}
+
 - (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info
 {
     // The default implementation of this method does nothing. Subclasses must override this method
     // and implement code to load a rewarded video here.
-    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (BOOL)hasAdAvailable
 {
-    // The default implementation of this method does nothing. Subclasses must override this method
-    // and implement coheck whether or not a rewarded vidoe ad is available for presentation.
-    [self doesNotRecognizeSelector:_cmd];
+    // Subclasses must override this method and implement coheck whether or not a rewarded vidoe ad
+    // is available for presentation.
 
     return NO;
 }
@@ -30,7 +34,6 @@
 {
     // The default implementation of this method does nothing. Subclasses must override this method
     // and implement code to display a rewarded video here.
-    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (BOOL)enableAutomaticImpressionAndClickTracking
@@ -44,14 +47,12 @@
 {
     // The default implementation of this method does nothing. Subclasses must override this method
     // and implement code to handle when another ad unit plays an ad for the same ad network this custom event is representing.
-    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)handleCustomEventInvalidated
 {
     // The default implementation of this method does nothing. Subclasses must override this method
     // and implement code to handle when the custom event is no longer needed by the rewarded video system.
-    [self doesNotRecognizeSelector:_cmd];
 }
 
 @end

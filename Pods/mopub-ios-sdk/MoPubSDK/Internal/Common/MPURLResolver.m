@@ -5,16 +5,22 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WebKit/WebKit.h>
 #import "MPURLResolver.h"
 #import "NSURL+MPAdditions.h"
 #import "NSHTTPURLResponse+MPAdditions.h"
 #import "MPInstanceProvider.h"
 #import "MPLogging.h"
 #import "MPCoreInstanceProvider.h"
+#import "MOPUBExperimentProvider.h"
+#import "NSURL+MPAdditions.h"
 
 static NSString * const kMoPubSafariScheme = @"mopubnativebrowser";
 static NSString * const kMoPubSafariNavigateHost = @"navigate";
 static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
+static NSString * const kWebviewClickthroughHost = @"ads.mopub.com";
+static NSString * const kWebviewClickthroughPath = @"/m/aclk";
+static NSString * const kRedirectURLQueryStringKey = @"r";
 
 @interface MPURLResolver ()
 
@@ -66,6 +72,9 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
     MPURLActionInfo *info = [self actionInfoFromURL:self.originalURL error:&error];
 
     if (info) {
+        [self safeInvokeAndNilCompletionBlock:info error:nil];
+    } else if ([self shouldEnableClickthroughExperiment]) {
+        MPURLActionInfo *info = [MPURLActionInfo infoWithURL:self.originalURL webViewBaseURL:self.currentURL];
         [self safeInvokeAndNilCompletionBlock:info error:nil];
     } else if (error) {
         [self safeInvokeAndNilCompletionBlock:nil error:error];
@@ -125,6 +134,22 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
         actionInfo = [MPURLActionInfo infoWithURL:self.originalURL shareURL:URL];
     } else if ([self URLShouldOpenInApplication:URL]) {
         actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
+    } else if ([URL.scheme isEqualToString:@"http"]) { // handle HTTP requests in particular to get around ATS settings
+        // As a note: `appTransportSecuritySettings` returns what makes sense for the iOS version. I.e., if the device
+        // is running iOS 8, this method will always return `MPATSSettingAllowsArbitraryLoads`. If the device is running
+        // iOS 9, this method will never give us `MPATSSettingAllowsArbitraryLoadsInWebContent`. As a result, we don't
+        // have to do OS checks here; we can just trust these settings.
+        MPATSSetting settings = [[MPCoreInstanceProvider sharedProvider] appTransportSecuritySettings];
+
+        if ((settings & MPATSSettingAllowsArbitraryLoads) != 0) { // opens as normal if ATS is disabled
+            // don't do anything
+        } else if ((settings & MPATSSettingAllowsArbitraryLoadsInWebContent) != 0) { // opens in WKWebView if ATS is disabled for arbitrary web content
+            actionInfo = [MPURLActionInfo infoWithURL:self.originalURL
+                                       webViewBaseURL:self.currentURL];
+        } else { // opens in Mobile Safari if no other option is available
+            actionInfo = [MPURLActionInfo infoWithURL:self.originalURL
+                                 safariDestinationURL:self.currentURL];
+        }
     }
 
     return actionInfo;
@@ -208,7 +233,7 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
         NSString *charset = [contentType substringWithRange:[charsetResult range]];
 
         // ensure that charset is not deallocated early
-        CFStringRef cfCharset = CFBridgingRetain(charset);
+        CFStringRef cfCharset = (CFStringRef)CFBridgingRetain(charset);
         CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding(cfCharset);
         CFBridgingRelease(cfCharset);
 
@@ -264,6 +289,40 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     [self safeInvokeAndNilCompletionBlock:nil error:error];
+}
+
+#pragma mark - Check if it's necessary to include a URL in the clickthrough experiment.
+// There are two types of clickthrough URL sources: from webviews and from non-web views.
+// The ones from webviews start with (https|http)://ads.mopub.com/m/aclk
+// For webviews, in order for a URL to be included in the clickthrough experiment, redirect URL scheme needs to be http/https.
+
+- (BOOL)shouldEnableClickthroughExperiment
+{
+    if (!self.currentURL) {
+        return NO;
+    }
+
+    // If redirect URL isn't http/https, do not include it in the clickthrough experiment.
+    if (![self URLIsHTTPOrHTTPS:self.currentURL]) {
+        return NO;
+    }
+
+    // Clickthroughs from webviews
+    if ([self.currentURL.host isEqualToString:kWebviewClickthroughHost] &&
+        [self.currentURL.path isEqualToString:kWebviewClickthroughPath]) {
+
+        NSString *redirectURLStr = [self.currentURL mp_queryParameterForKey:kRedirectURLQueryStringKey];
+        if (!redirectURLStr || ![self URLIsHTTPOrHTTPS:[NSURL URLWithString:redirectURLStr]]) {
+            return NO;
+        }
+    }
+
+    // Check experiment variant is in test group.
+    if ([MPAdDestinationDisplayAgent shouldUseSafariViewController] ||
+            [MOPUBExperimentProvider displayAgentType] == MOPUBDisplayAgentTypeNativeSafari) {
+        return YES;
+    }
+    return NO;
 }
 
 @end
