@@ -10,15 +10,15 @@ import Foundation
 import SystemConfiguration
 import UIKit
 
-public class Reachability {
+open class Reachability {
     
     // NOTE: - Class is mainly used to check if the user has a sufficient network connection. If not, we can ignore trying to initiate network calls.
     
     class func isConnectedToNetwork() -> Bool {
         var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(sizeofValue(zeroAddress))
+        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
         zeroAddress.sin_family = sa_family_t(AF_INET)
-        let defaultRouteReachability = withUnsafePointer(&zeroAddress) {
+        let defaultRouteReachability = withUnsafePointer(to: &zeroAddress) {
             SCNetworkReachabilityCreateWithAddress(nil, UnsafePointer($0))
         }
         var flags = SCNetworkReachabilityFlags()
@@ -30,9 +30,9 @@ public class Reachability {
         return (isReachable && !needsConnection)
     }
     
-    class func displayNoConnectionAlert(viewController: UIViewController) {
-        let noConnectionAlert = UIAlertController(title: "No Internet Connection", message: "Make sure your device is connected to the internet.", preferredStyle: .Alert)
-        noConnectionAlert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
-        viewController.presentViewController(noConnectionAlert, animated: true, completion: nil)
+    class func displayNoConnectionAlert(_ viewController: UIViewController) {
+        let noConnectionAlert = UIAlertController(title: "No Internet Connection", message: "Make sure your device is connected to the internet.", preferredStyle: .alert)
+        noConnectionAlert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+        viewController.present(noConnectionAlert, animated: true, completion: nil)
     }
 }

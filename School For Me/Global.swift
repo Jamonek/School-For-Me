@@ -13,7 +13,7 @@ struct Global {
     static var schoolID: Int? // Work around for passing the selected location ID
     static var userCoord: CLLocationCoordinate2D?
     
-    func computeDistance(coordinates: CLLocationCoordinate2D, sCoordinates: CLLocationCoordinate2D) -> Double {
+    func computeDistance(_ coordinates: CLLocationCoordinate2D, sCoordinates: CLLocationCoordinate2D) -> Double {
         // User coordinate
         let uLat: Double = coordinates.latitude
         let uLng: Double = coordinates.longitude

@@ -9,13 +9,13 @@
 
 import Foundation
 
-postfix operator ° {}
+postfix operator °
 postfix func °(degrees: Double) -> Double {return degrees * M_PI / 180.0}
 
 public struct Coordinate {
     public let latitude: Double, longitude: Double
-    public enum EarthUnits: Double {case ImperialRadius = 3961.0,  MetricRadius = 6373.0}
-    public func distanceFrom(coordinate: Coordinate, radius: EarthUnits = .ImperialRadius) -> Double {
+    public enum EarthUnits: Double {case imperialRadius = 3961.0,  metricRadius = 6373.0}
+    public func distanceFrom(_ coordinate: Coordinate, radius: EarthUnits = .imperialRadius) -> Double {
         let (dLat, dLon) = (latitude - coordinate.latitude, longitude - coordinate.longitude)
         let (sqSinLat, sqSinLon) = (pow(sin(dLat° / 2.0), 2.0), pow(sin(dLon° / 2.0), 2.0))
         let a = sqSinLat + sqSinLon * cos(latitude°) * cos(coordinate.latitude°)

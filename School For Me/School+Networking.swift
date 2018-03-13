@@ -15,15 +15,15 @@ import Async
 
 extension School {
     
-    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: (result: Bool) -> Void) {
+    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: @escaping (_ result: Bool) -> Void) {
         let param: [String: AnyObject] = [
-            "lat": coordinate.latitude,
-            "lng": coordinate.longitude,
-            "distance": distance
+            "lat": coordinate.latitude as AnyObject,
+            "lng": coordinate.longitude as AnyObject,
+            "distance": distance as AnyObject
         ]
         
         if !Reachability.isConnectedToNetwork() {
-            completion(result: false)
+            completion(false)
             print("no connection called")
             return
         }

@@ -46,7 +46,7 @@ class School: Object, Mappable {
         self.init()
     }
     
-    func mapping(map: Map) {
+    func mapping(_ map: Map) {
         id <- map["properties.id"]
         school_name <- map["properties.school_name"]
         nces_district_id <- map["properties.nces_district_id"]
@@ -81,7 +81,7 @@ class School: Object, Mappable {
         return "id"
     }
     
-    static func mappedSchool(dict:Dictionary<String, AnyObject>) -> School {
+    static func mappedSchool(_ dict:Dictionary<String, AnyObject>) -> School {
         return Mapper<School>().map(dict)! as School
     }
 }

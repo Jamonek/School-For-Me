@@ -15,7 +15,7 @@ extension Double {
     
     // Round method from http://stackoverflow.com/a/32581409
     /// Rounds the double to decimal places value
-    func roundToPlaces(places:Int) -> Double {
+    func roundToPlaces(_ places:Int) -> Double {
         let divisor = pow(10.0, Double(places))
         return round(self * divisor) / divisor
     }
