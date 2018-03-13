@@ -53,11 +53,11 @@ class FilterVC: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    func dismissView(_ sender: UIButton) {
+    @objc func dismissView(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
     
-    func sendSwitchNotification(_ sender: UISwitch) {
+    @objc func sendSwitchNotification(_ sender: UISwitch) {
         switch sender {
         case charterSwitch:
             NotificationCenter.default.post(name: Notification.Name(rawValue: "charterSwitchNotification"), object: nil)

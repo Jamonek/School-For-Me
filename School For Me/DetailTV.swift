@@ -14,7 +14,7 @@ import Async
 import MessageUI
 
 class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
-    var schoolData: [School]?
+    @objc var schoolData: [School]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +35,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
         
         // Navigation items
         let reportIcon = FAKFontAwesome.flagIcon(withSize: 25)
-        reportIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.red)
+        reportIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.red)
         let reportIconImage = reportIcon?.image(with: CGSize(width: 30, height: 30))
         let reportButton = UIBarButtonItem(image: reportIconImage, style: .plain, target: self, action: #selector(DetailTV.mailPop(_:)))
         navigationItem.rightBarButtonItem = reportButton
@@ -52,12 +52,12 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
         switch indexPath.row {
         case 0:
             let schoolIcon = FAKFontAwesome.buildingIcon(withSize: 25)
-            schoolIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            schoolIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = schoolIcon?.image(with: CGSize(width: 30, height: 30))
             cell.detailLabel.text = schoolData![0].school_name
         case 1:
             let locationIcon = FAKFontAwesome.mapMarkerIcon(withSize: 25)
-            locationIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            locationIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = locationIcon?.image(with: CGSize(width: 30, height: 30))
             cell.detailLabel.text = "\(schoolData![0].street) \(schoolData![0].city), \(schoolData![0].state) \(schoolData![0].zip)"
             cell.detailLabel.numberOfLines = 0
@@ -81,22 +81,22 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             cell.addConstraint(NSLayoutConstraint(item: mapView, attribute: .bottom, relatedBy: .equal, toItem: cell.contentView, attribute: .bottom, multiplier: 1.0, constant: 0))
         case 2:
             let phoneIcon = FAKFontAwesome.phoneIcon(withSize: 25)
-            phoneIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            phoneIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = phoneIcon?.image(with: CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].phone
         case 3:
             let infoIcon = FAKFontAwesome.infoIcon(withSize: 25)
-            infoIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            infoIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = infoIcon?.image(with: CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].district
         case 4:
             let infoIcon = FAKFontAwesome.infoIcon(withSize: 25)
-            infoIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            infoIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = infoIcon?.image(with: CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = schoolData![0].county_name
         case 5:
             let gradIcon = FAKFontAwesome.graduationCapIcon(withSize: 25)
-            gradIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            gradIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = gradIcon?.image(with: CGSize(width: 30.0, height: 30.0))
             cell.detailLabel.text = "\(schoolData![0].low_grade) - \(schoolData![0].high_grade)"
         case 6:
@@ -104,11 +104,11 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             switch schoolData![0].charter {
             case "Yes":
                 let statusIcon = FAKFontAwesome.checkIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             default:
                 let statusIcon = FAKFontAwesome.timesIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             }
             cell.detailLabel.text = "Charter"
@@ -118,18 +118,18 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             switch schoolData![0].magnet {
             case "Yes":
                 let statusIcon = FAKFontAwesome.checkIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             default:
                 let statusIcon = FAKFontAwesome.timesIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             }
             cell.detailLabel.text = "Magnet"
             cell.detailLeftImage.image = statusImage
         case 8:
             let userIcon = FAKFontAwesome.lineChartIcon(withSize: 25)
-            userIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+            userIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
             cell.detailLeftImage.image = userIcon?.image(with: CGSize(width: 30, height: 30))
             let studentTeacherRatio = Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)
             let freeLunchRatio = Double(schoolData![0].freeLunch)!.roundToPlaces(2)
@@ -142,11 +142,11 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             switch schoolData![0].title1 {
             case "Yes":
                 let statusIcon = FAKFontAwesome.checkIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             default:
                 let statusIcon = FAKFontAwesome.timesIcon(withSize: 25)
-                statusIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
+                statusIcon?.addAttribute(NSAttributedStringKey.foregroundColor.rawValue, value: UIColor.white)
                 statusImage = statusIcon?.image(with: CGSize(width: 30, height: 30))
             }
             cell.detailLabel.text = "Title 1"
@@ -171,11 +171,11 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
         return 10
     }
     
-    func dismissView(_ sender: AnyObject) {
+    @objc func dismissView(_ sender: AnyObject) {
         self.navigationController?.popViewController(animated: true)
     }
     
-    func mailPop(_ sender: AnyObject) {
+    @objc func mailPop(_ sender: AnyObject) {
         let toRecipents = ["jamone.kelly@gmail.com"]
         let mc: MFMailComposeViewController = MFMailComposeViewController()
         mc.mailComposeDelegate = self

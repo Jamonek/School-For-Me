@@ -15,7 +15,7 @@ import Async
 
 extension School {
     
-    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: @escaping (_ result: Bool) -> Void) {
+    @objc static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: @escaping (_ result: Bool) -> Void) {
         let param: [String: AnyObject] = [
             "lat": coordinate.latitude as AnyObject,
             "lng": coordinate.longitude as AnyObject,
@@ -61,7 +61,7 @@ extension School {
         }
     }
     
-    static func total() -> Int {
+    @objc static func total() -> Int {
         let realm = try! Realm()
         let data = realm.objects(School.self)
         

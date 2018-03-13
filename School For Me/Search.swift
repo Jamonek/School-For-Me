@@ -15,12 +15,12 @@ import MapKit
 class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet var searchBar: UISearchBar!
     @IBOutlet var tableView: UITableView!
-    var filteredResults = [School]()
+    @objc var filteredResults = [School]()
     let realm = try! Realm()
-    var searchString: String = String()
+    @objc var searchString: String = String()
     var schoolData: Results<School>?
-    let mainQueue = OperationQueue.main
-    var searchDict = ["title1":false, "charter":false, "magnet":false] // false represents off state, true being filter is applied
+    @objc let mainQueue = OperationQueue.main
+    @objc var searchDict = ["title1":false, "charter":false, "magnet":false] // false represents off state, true being filter is applied
     let g = Global()
     
     override func viewDidLoad() {
@@ -89,7 +89,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         })
     }
     
-    func dismissView(_ sender: AnyObject) {
+    @objc func dismissView(_ sender: AnyObject) {
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -107,8 +107,8 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
         let attributes = [
-            NSFontAttributeName: UIFont.boldSystemFont(ofSize: 18.0),
-            NSForegroundColorAttributeName: UIColor.black
+            NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 18.0),
+            NSAttributedStringKey.foregroundColor: UIColor.black
         ]
         
         return NSAttributedString(string: "No search results", attributes: attributes)
@@ -123,9 +123,9 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         paragraph.alignment = .center
         
         let attributes = [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 14.0),
-            NSForegroundColorAttributeName: UIColor.black,
-            NSParagraphStyleAttributeName: paragraph
+            NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14.0),
+            NSAttributedStringKey.foregroundColor: UIColor.black,
+            NSAttributedStringKey.paragraphStyle: paragraph
         ]
         
         return NSAttributedString(string: text, attributes: attributes)
@@ -171,7 +171,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     // Quick, and dirty way to attempt filtering
     // Pretty redundant.. refactor coming soon
     // Rush to market for 1.0 then rewrite for quality
-    func updateResults() -> Void {
+    @objc func updateResults() -> Void {
         var predicates = [NSPredicate]()
         
         if !self.searchString.isEmpty {
@@ -200,7 +200,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         self.tableView.reloadData()
     }
     
-    func filterSchools(searchString searchText: String = "") {
+    @objc func filterSchools(searchString searchText: String = "") {
         if searchText.isEmpty {
             filteredResults.removeAll()
             self.tableView.reloadData()
@@ -236,7 +236,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         self.tableView.reloadData()
     }
     
-    func presentFilterOptions(_ sender: UIBarButtonItem) {
+    @objc func presentFilterOptions(_ sender: UIBarButtonItem) {
         self.performSegue(withIdentifier: "filterSegue", sender: self)
     }
 }

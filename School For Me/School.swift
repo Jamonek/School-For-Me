@@ -12,35 +12,35 @@ import ObjectMapper
 import CoreLocation
 
 class School: Object, Mappable {
-    dynamic var id  = ""
-    dynamic var school_name: String = ""
-    dynamic var nces_school_id = ""
-    dynamic var state_school_id = ""
-    dynamic var nces_district_id = ""
-    dynamic var state_district_id = ""
-    dynamic var low_grade = ""
-    dynamic var high_grade = ""
-    dynamic var district = ""
-    dynamic var county_name = ""
-    dynamic var street = ""
-    dynamic var city = ""
-    dynamic var state = ""
-    dynamic var zip = ""
-    dynamic var zip4 = ""
-    dynamic var phone = ""
-    dynamic var locale_code = ""
-    dynamic var locale = ""
-    dynamic var charter = ""
-    dynamic var magnet = ""
-    dynamic var lat = ""
-    dynamic var lon = ""
-    dynamic var title1 = ""
-    dynamic var title1SchoolWide = ""
-    dynamic var students = ""
-    dynamic var teachers = ""
-    dynamic var studentTeacherRatio = ""
-    dynamic var freeLunch = ""
-    dynamic var reducedLunch = ""
+    @objc dynamic var id  = ""
+    @objc dynamic var school_name: String = ""
+    @objc dynamic var nces_school_id = ""
+    @objc dynamic var state_school_id = ""
+    @objc dynamic var nces_district_id = ""
+    @objc dynamic var state_district_id = ""
+    @objc dynamic var low_grade = ""
+    @objc dynamic var high_grade = ""
+    @objc dynamic var district = ""
+    @objc dynamic var county_name = ""
+    @objc dynamic var street = ""
+    @objc dynamic var city = ""
+    @objc dynamic var state = ""
+    @objc dynamic var zip = ""
+    @objc dynamic var zip4 = ""
+    @objc dynamic var phone = ""
+    @objc dynamic var locale_code = ""
+    @objc dynamic var locale = ""
+    @objc dynamic var charter = ""
+    @objc dynamic var magnet = ""
+    @objc dynamic var lat = ""
+    @objc dynamic var lon = ""
+    @objc dynamic var title1 = ""
+    @objc dynamic var title1SchoolWide = ""
+    @objc dynamic var students = ""
+    @objc dynamic var teachers = ""
+    @objc dynamic var studentTeacherRatio = ""
+    @objc dynamic var freeLunch = ""
+    @objc dynamic var reducedLunch = ""
     
     required convenience init?(map: Map) {
         self.init()
@@ -81,7 +81,7 @@ class School: Object, Mappable {
         return "id"
     }
     
-    static func mappedSchool(_ dict:Dictionary<String, AnyObject>) -> School {
+    @objc static func mappedSchool(_ dict:Dictionary<String, AnyObject>) -> School {
         //return Mapper<School>().map(dict)! as School
         return Mapper<School>().map(JSON: dict)! as School
     }

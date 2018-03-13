@@ -18,11 +18,11 @@ import MoPub
 class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var searchBar: UISearchBar!
-    var locationManager : CLLocationManager!
+    @objc var locationManager : CLLocationManager!
     @IBOutlet var searchView: UIView!
     @IBOutlet var MVTopConstraint: NSLayoutConstraint!
     
-    var adView: MPAdView = MPAdView(adUnitId: "ea61ed364b0b4be4a2c61f6655cb9153", size: MOPUB_BANNER_SIZE)
+    @objc var adView: MPAdView = MPAdView(adUnitId: "ea61ed364b0b4be4a2c61f6655cb9153", size: MOPUB_BANNER_SIZE)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,7 +133,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     }
     
     // This can be modified using Notifications
-    func populate() {
+    @objc func populate() {
         SVProgressHUD.setDefaultMaskType(.black)
         SVProgressHUD.show(withStatus: "Loading school data..")
         var locArray = [SchoolAnnotation]()

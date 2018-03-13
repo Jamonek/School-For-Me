@@ -363,7 +363,7 @@
 					64B8F2581C1515CB005BC4A9 = {
 						CreatedOnToolsVersion = 7.1.1;
 						DevelopmentTeam = W29D5BE398;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 0920;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
 								enabled = 1;
@@ -378,12 +378,12 @@
 					};
 					64B8F26F1C1515CB005BC4A9 = {
 						CreatedOnToolsVersion = 7.1.1;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 0920;
 						TestTargetID = 64B8F2581C1515CB005BC4A9;
 					};
 					64B8F27A1C1515CC005BC4A9 = {
 						CreatedOnToolsVersion = 7.1.1;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 0920;
 						TestTargetID = 64B8F2581C1515CB005BC4A9;
 					};
 				};
@@ -778,7 +778,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -801,7 +801,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -815,7 +815,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-MeTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/School For Me.app/School For Me";
 			};
 			name = Debug;
@@ -828,7 +828,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-MeTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/School For Me.app/School For Me";
 			};
 			name = Release;
@@ -840,7 +840,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-MeUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = "School For Me";
 				USES_XCTRUNNER = YES;
 			};
@@ -853,7 +853,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-MeUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = "School For Me";
 				USES_XCTRUNNER = YES;
 			};

@@ -10,7 +10,7 @@ import MapKit
 
 class SchoolAnnotation: NSObject, MKAnnotation {
     var title: String?
-    var district: String!
+    @objc var district: String!
     let coordinate: CLLocationCoordinate2D
     var subtitle: String? {
         return district
@@ -24,7 +24,7 @@ class SchoolAnnotation: NSObject, MKAnnotation {
         self.schoolID = 0
     }
     
-    init(title: String, district: String, coordinate: CLLocationCoordinate2D, schoolID: Int) {
+    @objc init(title: String, district: String, coordinate: CLLocationCoordinate2D, schoolID: Int) {
         self.title = title
         self.district = district
         self.coordinate = coordinate

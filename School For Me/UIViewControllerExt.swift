@@ -9,7 +9,7 @@
 import UIKit
 
 extension UIViewController {
-    func showDetailTV(_ sender: AnyObject?) {
+    @objc func showDetailTV(_ sender: AnyObject?) {
         let detailTV = self.storyboard!.instantiateViewController(withIdentifier: "detailTV") as! DetailTV
         self.navigationController!.pushViewController(detailTV, animated: true)
     }

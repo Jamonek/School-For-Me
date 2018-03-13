@@ -15,7 +15,7 @@ import RealmSwift
 import Async
 
 extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
-    func presentSearchView(_ sender: UIButton) {
+    @objc func presentSearchView(_ sender: UIButton) {
         //self.navigationController!.navigationBarHidden = !self.navigationController!.navigationBarHidden
         //MVTopConstraint.constant = 45
         self.performSegue(withIdentifier: "searchSegue", sender: self)
@@ -26,7 +26,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         MVTopConstraint.constant = 0
     }
     
-    func dismissSearch(_ sender: AnyObject) {
+    @objc func dismissSearch(_ sender: AnyObject) {
         if self.searchBar.isFirstResponder {
             self.resignFirstResponder()
         }

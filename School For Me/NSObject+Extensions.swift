@@ -10,7 +10,7 @@ import Foundation
 
 extension NSObject {
     
-    class func className() -> String {
+    @objc class func className() -> String {
         return NSStringFromClass(self).components(separatedBy: ".").last!
     }
     
