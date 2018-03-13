@@ -28,13 +28,11 @@ extension School {
             return
         }
         
-        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForResource = 5
-        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForRequest = 5
-        Alamofire.Manager.sharedInstance.request(.POST, "https://jamonek.com/api/sfm/geo.php", parameters: param).responseJSON { response in
+        Alamofire.request("https://jamonek.com/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
             print(response.request)
             if response.result.isFailure {
                 print("API Failure")
-                completion(result: false)
+                completion(false)
                 return
             }
             
@@ -49,15 +47,15 @@ extension School {
                             }
                         } catch {
                             print("Error adding location")
-                            completion(result: false)
+                            completion(false)
                         }
                     }
                 }
-                completion(result: true)
+                completion(true)
                 return
             } else {
                 print("Unable to parse JSON.. possibly no data")
-                completion(result: false)
+                completion(false)
                 return
             }
         }
@@ -65,7 +63,7 @@ extension School {
     
     static func total() -> Int {
         let realm = try! Realm()
-        let data = realm.objects(School)
+        let data = realm.objects(School.self)
         
         return data.count
     }

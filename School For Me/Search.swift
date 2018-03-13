@@ -47,8 +47,8 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         self.tableView.dataSource = self
         self.tableView.tableFooterView = UIView()
         self.tableView.keyboardDismissMode = .onDrag
-        //self.searchBar.backgroundColor = UIColor.flatSkyBlueColor()
-        //self.searchBar.barTintColor = UIColor.flatSkyBlueColor()
+        //self.searchBar.backgroundColor = UIColor.flatSkyBlue
+        //self.searchBar.barTintColor = UIColor.flatSkyBlue
         
         // Observers
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "titleSwitchNotification"), object: nil, queue: mainQueue,
@@ -138,11 +138,11 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! SearchCells
-        cell.backgroundColor = UIColor.flatSkyBlueColor()
+        cell.backgroundColor = UIColor.flatSkyBlue
         cell.schoolName.text = filteredResults[indexPath.row].school_name
         cell.schoolDistrict.text = filteredResults[indexPath.row].district
         let sCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: Double(filteredResults[indexPath.row].lat)!, longitude: Double(filteredResults[indexPath.row].lon)!)
-        let distance: Double = g.computeDistance(Global.userCoord!, sCoordinates: sCoordinate)
+        var distance: Double = g.computeDistance(Global.userCoord!, sCoordinates: sCoordinate)
         cell.schoolDistance.text = "\(distance.roundToPlaces(2)) miles away"
         cell.schoolName.sizeToFit()
         cell.schoolDistrict.sizeToFit()

@@ -15,7 +15,7 @@ import RealmSwift
 import Firebase
 import FirebaseInstanceID
 import FirebaseMessaging
-import mopub_ios_sdk
+import MoPub
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Add observer for InstanceID token refresh callback.
         NotificationCenter.default.addObserver(self, selector: #selector(self.tokenRefreshNotificaiton), name: NSNotification.Name.InstanceIDTokenRefresh, object: nil)
         
-        Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlueColor(), withContentStyle: .Contrast)
+        Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlue, with: .contrast)
         Fabric.with([Crashlytics.self, MoPub.self])
 
         

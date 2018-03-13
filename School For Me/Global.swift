@@ -27,7 +27,7 @@ struct Global {
         let deltaL = (sLng.degreesToRadians - uLng.degreesToRadians)
         let a = sin(deltaP/2) * sin(deltaP/2) + cos(uLat.degreesToRadians) * cos(sLat.degreesToRadians) * sin(deltaL/2) * sin(deltaL/2)
         let c = 2 * atan2(sqrt(a), sqrt(1-a))
-        let d = radius * c
+        var d = radius * c
         
         return d.roundToPlaces(2) // distance in miles rounded to 2 decimal places
     }

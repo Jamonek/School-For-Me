@@ -3,7 +3,8 @@ use_frameworks!
 
 target 'School For Me' do
     pod 'RealmSwift'
-    pod 'ChameleonFramework/Swift'
+    #pod 'ChameleonFramework/Swift', :git => 'https://github.com/ViccAlexander/Chameleon.git', :branch => 'wip/swift4'
+    pod 'ChameleonFramework/Swift', :git => 'https://github.com/ViccAlexander/Chameleon.git'
     pod 'FontAwesomeKit'
     pod 'AlamofireObjectMapper'
     pod 'ObjectMapper'

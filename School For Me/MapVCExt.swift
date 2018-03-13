@@ -75,7 +75,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         let realm = try! Realm()
         let sID = (view.annotation as! SchoolAnnotation).schoolID
         let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(sID!))
-        data = realm.objects(School).filter(filter)
+        data = realm.objects(School.self).filter(filter)
         sData = data.map{ $0 } // :<
         
         
@@ -150,9 +150,9 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         
         let seeMoreButton = UIButton()
         seeMoreButton.frame = CGRect(x: sX*0.22, y: sY*0.65, width: 200, height: 20)
-        seeMoreButton.setAttributedTitle(NSAttributedString(string: "Expand", font: UIFont.boldSystemFont(ofSize: 16), kerning: 1.0, color: UIColor.flatSkyBlueColor()), for: .Normal)
+        seeMoreButton.setAttributedTitle(NSAttributedString(string: "Expand", font: UIFont.boldSystemFont(ofSize: 16), kerning: 1.0, color: UIColor.flatSkyBlue), for: [])
         seeMoreButton.backgroundColor = UIColor.clear
-        seeMoreButton.addTarget(self, action: "showDetailTV:", for: .touchUpInside)
+        seeMoreButton.addTarget(self, action: #selector(UIViewController.showDetailTV(_:)), for: .touchUpInside)
         specialView.addSubview(seeMoreButton)
         
         

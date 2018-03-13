@@ -47,7 +47,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "detail") as! DetailTVC
-        cell.detailLeftView.backgroundColor = UIColor.flatSkyBlueColor()
+        cell.detailLeftView.backgroundColor = UIColor.flatSkyBlue
         cell.isUserInteractionEnabled = false
         switch indexPath.row {
         case 0:
@@ -131,7 +131,10 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
             let userIcon = FAKFontAwesome.lineChartIcon(withSize: 25)
             userIcon?.addAttribute(NSForegroundColorAttributeName, value: UIColor.white)
             cell.detailLeftImage.image = userIcon?.image(with: CGSize(width: 30, height: 30))
-            cell.detailLabel.text = "Students: \(Double(schoolData![0].students)!) | Teachers: \(Double(schoolData![0].teachers)!) | S/T Ratio: \(Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)) | Free Lunch: \(Double(schoolData![0].freeLunch)!.roundToPlaces(2)) | Reduced Lunch: \(Double(schoolData![0].reducedLunch)!.roundToPlaces(2))"
+            let studentTeacherRatio = Double(schoolData![0].studentTeacherRatio)!.roundToPlaces(2)
+            let freeLunchRatio = Double(schoolData![0].freeLunch)!.roundToPlaces(2)
+            let reducedLunchStat = Double(schoolData![0].reducedLunch)!.roundToPlaces(2)
+            cell.detailLabel.text = "Students: \(Double(schoolData![0].students)!) | Teachers: \(Double(schoolData![0].teachers)!) | S/T Ratio: \(studentTeacherRatio) | Free Lunch: \(freeLunchRatio) | Reduced Lunch: \(reducedLunchStat)"
             cell.detailLabel.numberOfLines = 0
             cell.detailLabel.sizeToFit()
         case 9:

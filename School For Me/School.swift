@@ -42,11 +42,11 @@ class School: Object, Mappable {
     dynamic var freeLunch = ""
     dynamic var reducedLunch = ""
     
-    required convenience init?(_ map: Map) {
+    required convenience init?(map: Map) {
         self.init()
     }
     
-    func mapping(_ map: Map) {
+    func mapping(map: Map) {
         id <- map["properties.id"]
         school_name <- map["properties.school_name"]
         nces_district_id <- map["properties.nces_district_id"]
@@ -82,6 +82,7 @@ class School: Object, Mappable {
     }
     
     static func mappedSchool(_ dict:Dictionary<String, AnyObject>) -> School {
-        return Mapper<School>().map(dict)! as School
+        //return Mapper<School>().map(dict)! as School
+        return Mapper<School>().map(JSON: dict)! as School
     }
 }

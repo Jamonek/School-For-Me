@@ -13,7 +13,7 @@ import CoreLocation
 import RealmSwift
 import SVProgressHUD
 import Async
-import mopub_ios_sdk
+import MoPub
 
 class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     @IBOutlet var mapView: MKMapView!
@@ -40,10 +40,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         
         // VC Title
         self.title = "School For Me"
-        searchView.backgroundColor = UIColor.flatSkyBlueColor()
+        searchView.backgroundColor = UIColor.flatSkyBlue
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIcon(withSize: 25).image(with: CGSize(width: 30, height: 30))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .plain, target: self, action: "presentSearchView:")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .plain, target: self, action: #selector(MapVC.presentSearchView(_:)))
         SVProgressHUD.setDefaultMaskType(.black)
         SVProgressHUD.show(withStatus: "Contacting school for me server..")
         
@@ -139,11 +139,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         var locArray = [SchoolAnnotation]()
         Async.background {
             let realm = try! Realm()
-            let data = realm.objects(School)
+            let data = realm.objects(School.self)
             
             if data.count < 1 {
                 // set onBoard to false.. exit and retry
-                SFMData.setBool(false, forKey: "onBoard")
+                SFMData.set(false, forKey: "onBoard")
                 return
             }
             
