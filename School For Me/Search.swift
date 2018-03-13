@@ -27,7 +27,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
         super.viewDidLoad()
         self.title = "Search"
 
-        schoolData = realm.objects(School)
+        schoolData = realm.objects(School.self)
         // Icons from FAK
         let listIcon = FAKFontAwesome.listUlIcon(withSize: 25).image(with: CGSize(width: 30, height: 30))
         _ = UIBarButtonItem(image: listIcon, style: .plain, target: self, action: nil) // Removed from navigation until feature is complete

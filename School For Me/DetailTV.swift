@@ -21,7 +21,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
         
         let realm = try! Realm()
         let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(Global.schoolID!))
-        let data = realm.objects(School).filter(filter)
+        let data = realm.objects(School.self).filter(filter)
         self.schoolData = data.map{ $0 } // :<
         
         if let viewTitle: String = self.schoolData?[0].school_name {
