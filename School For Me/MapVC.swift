@@ -31,7 +31,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         
         // Positions the ad at the bottom, with the correct size
         self.adView.frame = CGRect(x: 0, y: self.view.bounds.size.height - MOPUB_BANNER_SIZE.height,
-                                       width: MOPUB_BANNER_SIZE.width, height: MOPUB_BANNER_SIZE.height)
+                                       width: view.bounds.size.width, height: MOPUB_BANNER_SIZE.height)
         self.view.addSubview(self.adView)
         
         // Loads the ad over the network
