@@ -11,7 +11,7 @@ import MapKit
 
 extension MKPinAnnotationView {
     // There is definitely a better way to do this and pretty redundant but this is an MVP..
-    private struct AssociatedKeys {
+    fileprivate struct AssociatedKeys {
         static var schoolID:Int?
     }
     

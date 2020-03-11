@@ -1,8 +1,9 @@
 //
 //  MPAdAlertGestureRecognizer.m
-//  MoPub
 //
-//  Copyright (c) 2013 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPAdAlertGestureRecognizer.h"
@@ -13,6 +14,12 @@
 #define kDefaultMinTrackedDistance 100
 #define kDefaultNumZigZagsForRecognition 4
 
+typedef NS_ENUM(NSUInteger, MPAdAlertGestureRecognizerState) {
+    MPAdAlertGestureRecognizerState_ZigRight1,
+    MPAdAlertGestureRecognizerState_ZagLeft2,
+    MPAdAlertGestureRecognizerState_Recognized
+};
+
 NSInteger const kMPAdAlertGestureMaxAllowedYAxisMovement = 50;
 
 @interface MPAdAlertGestureRecognizer ()
@@ -22,17 +29,11 @@ NSInteger const kMPAdAlertGestureMaxAllowedYAxisMovement = 50;
 @property (nonatomic, assign) CGPoint startingPoint;
 @property (nonatomic, assign) BOOL thresholdReached;
 @property (nonatomic, assign) NSInteger curNumZigZags;
+@property (nonatomic, assign) NSInteger numZigZagsForRecognition; // default is 4
 
 @end
 
 @implementation MPAdAlertGestureRecognizer
-
-@synthesize currentAlertGestureState = _currentAlertGestureState;
-@synthesize inflectionPoint = _inflectionPoint;
-@synthesize thresholdReached = _thresholdReached;
-@synthesize curNumZigZags = _curNumZigZags;
-@synthesize numZigZagsForRecognition = _numZigZagsForRecognition;
-@synthesize minTrackedDistanceForZigZag = _minTrackedDistanceForZigZag;
 
 - (id)init
 {

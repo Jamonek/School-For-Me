@@ -1,9 +1,9 @@
 //
 //  MRProperty.m
-//  MoPub
 //
-//  Created by Andrew He on 12/13/11.
-//  Copyright (c) 2011 MoPub, Inc. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MRProperty.h"
@@ -26,8 +26,6 @@
 
 @implementation MRHostSDKVersionProperty : MRProperty
 
-@synthesize version = _version;
-
 + (instancetype)defaultProperty
 {
     MRHostSDKVersionProperty *property = [[self alloc] init];
@@ -45,8 +43,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation MRPlacementTypeProperty : MRProperty
-
-@synthesize placementType = _placementType;
 
 + (MRPlacementTypeProperty *)propertyWithType:(MRAdViewPlacementType)type {
     MRPlacementTypeProperty *property = [[self alloc] init];
@@ -70,8 +66,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation MRStateProperty
-
-@synthesize state = _state;
 
 + (MRStateProperty *)propertyWithState:(MRAdViewState)state {
     MRStateProperty *property = [[self alloc] init];
@@ -107,8 +101,6 @@
 
 @implementation MRScreenSizeProperty : MRProperty
 
-@synthesize screenSize = _screenSize;
-
 + (MRScreenSizeProperty *)propertyWithSize:(CGSize)size {
     MRScreenSizeProperty *property = [[self alloc] init];
     property.screenSize = size;
@@ -129,12 +121,9 @@
 
 + (NSDictionary *)supportedFeatures
 {
-    BOOL supportsSms, supportsTel;
-    supportsSms = supportsTel = [MPCoreInstanceProvider sharedProvider].sharedCarrierInfo[@"carrierName"] != nil;
-
     return [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithBool:supportsSms], @"sms",
-            [NSNumber numberWithBool:supportsTel], @"tel",
+            [NSNumber numberWithBool:NO], @"sms",
+            [NSNumber numberWithBool:NO], @"tel",
             [NSNumber numberWithBool:NO], @"calendar",
             [NSNumber numberWithBool:NO], @"storePicture",
             [NSNumber numberWithBool:YES], @"inlineVideo",
@@ -177,8 +166,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation MRViewableProperty : MRProperty
-
-@synthesize isViewable = _isViewable;
 
 + (MRViewableProperty *)propertyWithViewable:(BOOL)viewable {
     MRViewableProperty *property = [[self alloc] init];

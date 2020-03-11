@@ -1,8 +1,9 @@
 //
 //  MPRealTimeTimer.m
-//  MoPubSampleApp
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPRealTimeTimer.h"
@@ -67,8 +68,8 @@
     self.timer = [MPTimer timerWithTimeInterval:self.currentTimeInterval
                                          target:self
                                        selector:@selector(fire)
-                                        repeats:NO];
-    self.timer.runLoopMode = NSRunLoopCommonModes;
+                                        repeats:NO
+                                    runLoopMode:NSRunLoopCommonModes];
     [self.timer scheduleNow];
     if (!self.fireDate) {
         self.fireDate = [NSDate dateWithTimeIntervalSinceNow:self.currentTimeInterval];
@@ -81,6 +82,11 @@
 }
 
 - (void)willEnterForeground {
+    // skip resetting the timer if it's already set (i.e., in the iOS 13 new-window case)
+    if ([self.timer isValid]) {
+        return;
+    }
+
     // check if date has passed and fire if needed
     NSComparisonResult result = [[NSDate date] compare:self.fireDate];
     if (result == NSOrderedSame || result == NSOrderedDescending) {

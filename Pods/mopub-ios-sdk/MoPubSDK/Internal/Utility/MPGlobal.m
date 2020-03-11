@@ -1,8 +1,9 @@
 //
 //  MPGlobal.m
-//  MoPub
 //
-//  Copyright 2011 MoPub, Inc. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPGlobal.h"
@@ -39,9 +40,25 @@ CGFloat MPStatusBarHeight() {
     return (width < height) ? width : height;
 }
 
-CGRect MPApplicationFrame()
+CGRect MPApplicationFrame(BOOL includeSafeAreaInsets)
 {
-    CGRect frame = MPScreenBounds();
+    // Starting with iOS8, the orientation of the device is taken into account when
+    // requesting the key window's bounds. We are making the assumption that the
+    // key window is equivalent to the application frame.
+    CGRect frame = [UIApplication sharedApplication].keyWindow.frame;
+
+    if (@available(iOS 11, *)) {
+        if (includeSafeAreaInsets) {
+            // Safe area insets include the status bar offset.
+            UIEdgeInsets safeInsets = UIApplication.sharedApplication.keyWindow.safeAreaInsets;
+            frame.origin.x = safeInsets.left;
+            frame.size.width -= (safeInsets.left + safeInsets.right);
+            frame.origin.y = safeInsets.top;
+            frame.size.height -= (safeInsets.top + safeInsets.bottom);
+
+            return frame;
+        }
+    }
 
     frame.origin.y += MPStatusBarHeight();
     frame.size.height -= MPStatusBarHeight();
@@ -51,23 +68,9 @@ CGRect MPApplicationFrame()
 
 CGRect MPScreenBounds()
 {
-    // Prior to iOS 8, window and screen coordinates were fixed and always specified relative to the
-    // device’s screen in a portrait orientation. Starting with iOS8, the `fixedCoordinateSpace`
-    // property was introduced which specifies bounds that always reflect the screen dimensions of
-    // the device in a portrait-up orientation.
-    CGRect bounds = [UIScreen mainScreen].bounds;
-    if ([[UIScreen mainScreen] respondsToSelector:@selector(fixedCoordinateSpace)]) {
-        bounds = [UIScreen mainScreen].fixedCoordinateSpace.bounds;
-    }
-
-    // Rotate the portrait-up bounds if the orientation of the device is in landscape.
-    if (UIInterfaceOrientationIsLandscape(MPInterfaceOrientation())) {
-        CGFloat width = bounds.size.width;
-        bounds.size.width = bounds.size.height;
-        bounds.size.height = width;
-    }
-
-    return bounds;
+    // Starting with iOS8, the orientation of the device is taken into account when
+    // requesting the key window's bounds.
+    return [UIScreen mainScreen].bounds;
 }
 
 CGSize MPScreenResolution()
@@ -95,8 +98,7 @@ NSDictionary *MPDictionaryFromQueryString(NSString *query) {
         NSArray *keyVal = [element componentsSeparatedByString:@"="];
         NSString *key = [keyVal objectAtIndex:0];
         NSString *value = [keyVal lastObject];
-        [queryDict setObject:[value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-                      forKey:key];
+        [queryDict setObject:[value stringByRemovingPercentEncoding] forKey:key];
     }
     return queryDict;
 }
@@ -188,21 +190,13 @@ NSString *MPResourcePathForResource(NSString *resourceName)
     if ([[NSBundle mainBundle] pathForResource:@"MoPub" ofType:@"bundle"] != nil) {
         return [@"MoPub.bundle" stringByAppendingPathComponent:resourceName];
     }
-    else if ([[UIDevice currentDevice].systemVersion compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending) {
+    else {
         // When using open source or cocoapods (on ios 8 and above), we can rely on the MoPub class
         // living in the same bundle/framework as the assets.
         // We can use pathForResource on ios 8 and above to succesfully load resources.
         NSBundle *resourceBundle = [NSBundle bundleForClass:[MoPub class]];
         NSString *resourcePath = [resourceBundle pathForResource:resourceName ofType:nil];
         return resourcePath;
-    }
-    else {
-        // We can just return the resource name because:
-        // 1. This is being used as an open source release so the resource will be
-        // in the main bundle.
-        // 2. This is cocoapods but CAN'T be using frameworks since that is only allowed
-        // on ios 8 and above.
-        return resourceName;
     }
 }
 
@@ -220,6 +214,15 @@ NSArray *MPConvertStringArrayToURLArray(NSArray *strArray)
     }
 
     return urls;
+}
+
+UIInterfaceOrientationMask MPInterstitialOrientationTypeToUIInterfaceOrientationMask(MPInterstitialOrientationType type)
+{
+    switch (type) {
+        case MPInterstitialOrientationTypePortrait: return UIInterfaceOrientationMaskPortrait;
+        case MPInterstitialOrientationTypeLandscape: return UIInterfaceOrientationMaskLandscape;
+        default: return UIInterfaceOrientationMaskAll;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,15 +243,6 @@ NSArray *MPConvertStringArrayToURLArray(NSArray *strArray)
 @end
 
 @implementation UIApplication (MPAdditions)
-
-- (void)mp_preIOS7setApplicationStatusBarHidden:(BOOL)hidden
-{
-    // Hiding the status bar should use a fade effect.
-    // Displaying the status bar should use no animation.
-    UIStatusBarAnimation animation = hidden ?
-    UIStatusBarAnimationFade : UIStatusBarAnimationNone;
-    [[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:animation];
-}
 
 - (BOOL)mp_supportsOrientationMask:(UIInterfaceOrientationMask)orientationMask
 {
@@ -308,78 +302,3 @@ NSArray *MPConvertStringArrayToURLArray(NSArray *strArray)
 }
 
 @end
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@interface MPTelephoneConfirmationController ()
-
-@property (nonatomic, strong) UIAlertView *alertView;
-@property (nonatomic, strong) NSURL *telephoneURL;
-@property (nonatomic, copy) MPTelephoneConfirmationControllerClickHandler clickHandler;
-
-@end
-
-@implementation MPTelephoneConfirmationController
-
-- (id)initWithURL:(NSURL *)url clickHandler:(MPTelephoneConfirmationControllerClickHandler)clickHandler
-{
-    if (![url mp_hasTelephoneScheme] && ![url mp_hasTelephonePromptScheme]) {
-        // Shouldn't be here as the url must have a tel or telPrompt scheme.
-        MPLogError(@"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
-        return nil;
-    }
-
-    if (self = [super init]) {
-        // If using tel://xxxxxxx, the host will be the number.  If using tel:xxxxxxx, we will try the resourceIdentifier.
-        NSString *phoneNumber = [url host];
-
-        if (!phoneNumber) {
-            phoneNumber = [url resourceSpecifier];
-            if ([phoneNumber length] == 0) {
-                MPLogError(@"Invalid telelphone URL: %@.", url.absoluteString);
-                return nil;
-            }
-        }
-
-        _alertView = [[UIAlertView alloc] initWithTitle: @"Are you sure you want to call?"
-                                                message:phoneNumber
-                                               delegate:self
-                                      cancelButtonTitle:@"Cancel"
-                                      otherButtonTitles:@"Call", nil];
-        self.clickHandler = clickHandler;
-
-        // We want to manually handle telPrompt scheme alerts.  So we'll convert telPrompt schemes to tel schemes.
-        if ([url mp_hasTelephonePromptScheme]) {
-            self.telephoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel://%@", phoneNumber]];
-        } else {
-            self.telephoneURL = url;
-        }
-    }
-
-    return self;
-}
-
-- (void)dealloc
-{
-    self.alertView.delegate = nil;
-    [self.alertView dismissWithClickedButtonIndex:0 animated:YES];
-}
-
-- (void)show
-{
-    [self.alertView show];
-}
-
-#pragma mark - UIAlertViewDelegate
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    BOOL confirmed = (buttonIndex == 1);
-
-    if (self.clickHandler) {
-        self.clickHandler(self.telephoneURL, confirmed);
-    }
-
-}
-
-@end
-

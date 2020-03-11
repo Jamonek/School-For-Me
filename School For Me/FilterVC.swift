@@ -28,22 +28,22 @@ class FilterVC: UIViewController {
         self.title = "Filters"
         
         // UINavigation Button
-        let closeIcon = FAKFontAwesome.closeIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon, style: .Plain, target: self, action: "dismissView:")
+        let closeIcon = FAKFontAwesome.closeIcon(withSize: 25).image(with: CGSize(width: 30, height: 30))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeIcon, style: .plain, target: self, action: #selector(FilterVC.dismissView(_:)))
         
         //let doneIcon = FAKFontAwesome.checkIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
         //self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: doneIcon, style: .Plain, target: self, action: nil)
         
         // Switches
-        charterSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
-        magnetSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
-        titleSwitch.addTarget(self, action: "sendSwitchNotification:", forControlEvents: .TouchUpInside)
+        charterSwitch.addTarget(self, action: #selector(FilterVC.sendSwitchNotification(_:)), for: .touchUpInside)
+        magnetSwitch.addTarget(self, action: #selector(FilterVC.sendSwitchNotification(_:)), for: .touchUpInside)
+        titleSwitch.addTarget(self, action: #selector(FilterVC.sendSwitchNotification(_:)), for: .touchUpInside)
         
-        self.viewDivider1.backgroundColor = UIColor.flatSkyBlueColor()
-        self.viewDivider2.backgroundColor = UIColor.flatSkyBlueColor()
+        self.viewDivider1.backgroundColor = UIColor.flatSkyBlue()
+        self.viewDivider2.backgroundColor = UIColor.flatSkyBlue()
     }
     
-    @IBAction func distanceSliderChange(sender: UISlider) {
+    @IBAction func distanceSliderChange(_ sender: UISlider) {
         let distance: Int = Int(sender.value)
         self.distanceLabel.text = "within \(distance) miles"
         self.distanceLabel.sizeToFit()
@@ -53,18 +53,18 @@ class FilterVC: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    func dismissView(sender: UIButton) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @objc func dismissView(_ sender: UIButton) {
+        self.dismiss(animated: true, completion: nil)
     }
     
-    func sendSwitchNotification(sender: UISwitch) {
+    @objc func sendSwitchNotification(_ sender: UISwitch) {
         switch sender {
         case charterSwitch:
-            NSNotificationCenter.defaultCenter().postNotificationName("charterSwitchNotification", object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "charterSwitchNotification"), object: nil)
         case magnetSwitch:
-            NSNotificationCenter.defaultCenter().postNotificationName("magnetSwitchNotification", object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "magnetSwitchNotification"), object: nil)
         case titleSwitch:
-            NSNotificationCenter.defaultCenter().postNotificationName("titleSwitchNotification", object: nil)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "titleSwitchNotification"), object: nil)
         default:
             break
         }

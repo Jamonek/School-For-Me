@@ -7,4 +7,4 @@
 //
 
 import Foundation
-let SFMData = NSUserDefaults.standardUserDefaults()
+let SFMData = UserDefaults.standard

@@ -13,16 +13,16 @@ import CoreLocation
 import RealmSwift
 import SVProgressHUD
 import Async
-import mopub_ios_sdk
+import MoPub
 
 class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     @IBOutlet var mapView: MKMapView!
     @IBOutlet var searchBar: UISearchBar!
-    var locationManager : CLLocationManager!
+    @objc var locationManager : CLLocationManager!
     @IBOutlet var searchView: UIView!
     @IBOutlet var MVTopConstraint: NSLayoutConstraint!
     
-    var adView: MPAdView = MPAdView(adUnitId: "ea61ed364b0b4be4a2c61f6655cb9153", size: MOPUB_BANNER_SIZE)
+    @objc var adView: MPAdView = MPAdView(adUnitId: "ea61ed364b0b4be4a2c61f6655cb9153", size: MOPUB_BANNER_SIZE)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +30,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         self.adView.delegate = self
         
         // Positions the ad at the bottom, with the correct size
-        self.adView.frame = CGRectMake(0, self.view.bounds.size.height - MOPUB_BANNER_SIZE.height,
-                                       MOPUB_BANNER_SIZE.width, MOPUB_BANNER_SIZE.height)
+        self.adView.frame = CGRect(x: 0, y: self.view.bounds.size.height - MOPUB_BANNER_SIZE.height,
+                                       width: view.bounds.size.width, height: MOPUB_BANNER_SIZE.height)
         self.view.addSubview(self.adView)
         
         // Loads the ad over the network
@@ -40,12 +40,12 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         
         // VC Title
         self.title = "School For Me"
-        searchView.backgroundColor = UIColor.flatSkyBlueColor()
+        searchView.backgroundColor = UIColor.flatSkyBlue()
         // Search Icon from FAK
-        let searchIcon = FAKFontAwesome.searchIconWithSize(25).imageWithSize(CGSize(width: 30, height: 30))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .Plain, target: self, action: "presentSearchView:")
-        SVProgressHUD.setDefaultMaskType(.Black)
-        SVProgressHUD.showWithStatus("Contacting school for me server..")
+        let searchIcon = FAKFontAwesome.searchIcon(withSize: 25).image(with: CGSize(width: 30, height: 30))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .plain, target: self, action: #selector(MapVC.presentSearchView(_:)))
+        SVProgressHUD.setDefaultMaskType(.black)
+        SVProgressHUD.show(withStatus: "Contacting school for me server..")
         
         // Delegates
         self.mapView.delegate = self
@@ -61,26 +61,26 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
             //self.mapView.setUserTrackingMode(MKUserTrackingMode.FollowWithHeading, animated: true)
             mapView.showsUserLocation = true // Show current location of user
         } else {
-            let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Error", message: "Please enable location services in your settings application.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
             return
         }
         
         if !Reachability.isConnectedToNetwork() {
-            let alert = UIAlertController(title: "Error", message: "A network connection is unavailable at the moment.", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+            let alert = UIAlertController(title: "Error", message: "A network connection is unavailable at the moment.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
             self.locationManager.stopUpdatingLocation()
             SVProgressHUD.dismiss()
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             return
         }
         
-        mapView.mapType = .Standard // Standard look of the map
-        mapView.zoomEnabled = true // Allow the user to zoom on the map via finger gestures
+        mapView.mapType = .standard // Standard look of the map
+        mapView.isZoomEnabled = true // Allow the user to zoom on the map via finger gestures
         
         // Hack until I find a better way to do this..
-        guard let onBoard : Bool = SFMData.objectForKey("onBoard") as? Bool else {
+        guard let onBoard : Bool = SFMData.object(forKey: "onBoard") as? Bool else {
             return
         }
         
@@ -96,17 +96,17 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     }
     
     // Better solution coming soon.. temporary
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //print("Coord: \(locations.last!.coordinate)")
-        guard let onBoard : Bool = SFMData.objectForKey("onBoard") as? Bool else {
+        guard let onBoard : Bool = SFMData.object(forKey: "onBoard") as? Bool else {
             print("onBoard not set.. returning nil")
-            SFMData.setBool(false, forKey: "onBoard")
+            SFMData.set(false, forKey: "onBoard")
             Global.userCoord = locations.last!.coordinate
             return
         }
         
         if !onBoard {
-            SFMData.setBool(true, forKey: "onBoard")
+            SFMData.set(true, forKey: "onBoard")
             print("Updating results")
             
             Global.userCoord = locations.last!.coordinate
@@ -115,11 +115,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
                     SVProgressHUD.dismiss()
                     self.populate()
                 } else {
-                    let alert = UIAlertController(title: "Error", message: "Unable to find any schools within your area. Check back soon.", preferredStyle: .Alert)
-                    alert.addAction(UIAlertAction(title: "Dismiss", style: .Default, handler: nil))
+                    let alert = UIAlertController(title: "Error", message: "Unable to find any schools within your area. Check back soon.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
                     self.locationManager.stopUpdatingLocation()
                     SVProgressHUD.dismiss()
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                     return
                 }
             }
@@ -133,17 +133,17 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
     }
     
     // This can be modified using Notifications
-    func populate() {
-        SVProgressHUD.setDefaultMaskType(.Black)
-        SVProgressHUD.showWithStatus("Loading school data..")
+    @objc func populate() {
+        SVProgressHUD.setDefaultMaskType(.black)
+        SVProgressHUD.show(withStatus: "Loading school data..")
         var locArray = [SchoolAnnotation]()
         Async.background {
             let realm = try! Realm()
-            let data = realm.objects(School)
+            let data = realm.objects(School.self)
             
             if data.count < 1 {
                 // set onBoard to false.. exit and retry
-                SFMData.setBool(false, forKey: "onBoard")
+                SFMData.set(false, forKey: "onBoard")
                 return
             }
             

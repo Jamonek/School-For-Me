@@ -1,27 +1,24 @@
 //
 //  MPWebView.h
-//  MoPubSDK
 //
-//  Copyright © 2016 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
-/***
- * MPWebView
- * This class is a wrapper class for WKWebView and UIWebView. Internally, it utilizes WKWebView when possible, and
- * falls back on UIWebView only when WKWebView isn't available (i.e., in iOS 7). MPWebView's interface is meant to
- * imitate UIWebView, and, in many cases, MPWebView can act as a drop-in replacement for UIWebView. MPWebView also
- * blocks all JavaScript text boxes from appearing.
+/**
+ * @c MPWebView
+ * This class is a wrapper class for @c WKWebView. @c MPWebView blocks all JavaScript text boxes from appearing.
  *
- * While `stringByEvaluatingJavaScriptFromString:` does exist for UIWebView compatibility reasons, it's highly
- * recommended that the caller uses `evaluateJavaScript:completionHandler:` whenever code can be reworked
- * to make use of completion blocks to keep the advantages of asynchronicity. It solely fires off the javascript
- * execution within WKWebView and does not wait or return.
+ * It's highly recommended that the caller uses @c `evaluateJavaScript:completionHandler:` whenever code can be reworked
+ * to make use of completion blocks to keep the advantages of asynchronicity. It solely fires off the javascript execution within
+ * @c WKWebView and does not wait or return.
  *
- * MPWebView currently does not support a few other features of UIWebView -- such as pagination -- as WKWebView also
- * does not contain support.
- ***/
+ * MPWebView currently does not support a few other features of WKWebView, such as pagination -- as WKWebView.
+ */
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 @class MPWebView;
 
@@ -31,7 +28,7 @@
 
 - (BOOL)webView:(MPWebView *)webView
 shouldStartLoadWithRequest:(NSURLRequest *)request
- navigationType:(UIWebViewNavigationType)navigationType;
+ navigationType:(WKNavigationType)navigationType;
 
 - (void)webViewDidStartLoad:(MPWebView *)webView;
 
@@ -46,19 +43,17 @@ typedef void (^MPWebViewJavascriptEvaluationCompletionHandler)(id result, NSErro
 
 @interface MPWebView : UIView
 
-// If you -need- UIWebView for some reason, use this method to init and send `YES` to `forceUIWebView` to be sure
-// you're using UIWebView regardless of OS. If any other `init` method is used, or if `NO` is used as the forceUIWebView
-// parameter, WKWebView will be used when available.
-- (instancetype)initWithFrame:(CGRect)frame forceUIWebView:(BOOL)forceUIWebView;
-
 @property (weak, nonatomic) id<MPWebViewDelegate> delegate;
+
+// When set to `YES`, `shouldConformToSafeArea` sets constraints on the WKWebView to always stay within the safe area
+// using the MPWebView's safeAreaLayoutGuide. Otherwise, the WKWebView will be constrained directly to MPWebView's
+// anchors to fill the whole container. Default is `NO`.
+//
+// This property has no effect on versions of iOS less than 11 or phones other than iPhone X.
+@property (nonatomic, assign) BOOL shouldConformToSafeArea;
 
 @property (nonatomic, readonly, getter=isLoading) BOOL loading;
 
-// These methods and properties are non-functional below iOS 9. If you call or try to set them, they'll do nothing.
-// For the properties, if you try to access them, you'll get `NO` 100% of the time. They are entirely hidden when
-// compiling with iOS 8 SDK or below.
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_9_0
 - (void)loadData:(NSData *)data
         MIMEType:(NSString *)MIMEType
 textEncodingName:(NSString *)encodingName
@@ -66,10 +61,6 @@ textEncodingName:(NSString *)encodingName
 
 @property (nonatomic) BOOL allowsLinkPreview;
 @property (nonatomic, readonly) BOOL allowsPictureInPictureMediaPlayback;
-#endif
-
-+ (void)forceWKWebView:(BOOL)shouldForce;
-+ (BOOL)isForceWKWebView;
 
 - (void)loadHTMLString:(NSString *)string
                baseURL:(NSURL *)baseURL;
@@ -98,8 +89,6 @@ textEncodingName:(NSString *)encodingName
 @property (nonatomic, readonly) BOOL mediaPlaybackRequiresUserAction;
 @property (nonatomic, readonly) BOOL mediaPlaybackAllowsAirPlay;
 
-// UIWebView+MPAdditions methods
 - (void)mp_setScrollable:(BOOL)scrollable;
-- (void)disableJavaScriptDialogs;
 
 @end

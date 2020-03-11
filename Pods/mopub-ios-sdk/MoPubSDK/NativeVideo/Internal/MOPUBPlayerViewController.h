@@ -1,16 +1,19 @@
 //
 //  MOPUBPlayerViewController.h
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
 #import "MOPUBPlayerView.h"
+#import "MPVASTTracking.h"
 
 @class AVPlayerItem;
 @class MOPUBAVPlayer;
 @class MOPUBPlayerViewController;
 @class MOPUBNativeVideoAdConfigValues;
-@class MPAdConfigurationLogEventProperties;
 @class MPVASTTracking;
 @class MPVideoConfig;
 
@@ -33,31 +36,28 @@
 
 @interface MOPUBPlayerViewController : UIViewController
 
-@property (nonatomic, readonly) NSURL *mediaURL;
-
 @property (nonatomic, readonly) MOPUBPlayerView *playerView;
 @property (nonatomic, readonly) AVPlayerItem *playerItem;
 @property (nonatomic, readonly) MOPUBAVPlayer *avPlayer;
-@property (nonatomic) MPVASTTracking *vastTracking;
+@property (nonatomic, readonly) MPVASTTracking *vastTracking;
 @property (nonatomic, readonly) CGFloat videoAspectRatio;
 @property (nonatomic, readonly) MOPUBNativeVideoAdConfigValues *nativeVideoAdConfig;
 
 #pragma mark - Configurations/States
 @property (nonatomic) MOPUBPlayerDisplayMode displayMode;
 @property (nonatomic) BOOL muted;
-@property (nonatomic) BOOL startedLoading;
 @property (nonatomic) BOOL playing;
 @property (nonatomic) BOOL paused;
 @property (nonatomic) BOOL isReadyToPlay;
 @property (nonatomic) BOOL disposed;
 
-#pragma - Call to action click tracking url
+#pragma mark - Call to action click tracking url
 @property (nonatomic) NSURL *defaultActionURL;
 
 @property (nonatomic, weak) id<MOPUBPlayerViewControllerDelegate> delegate;
 
 #pragma mark - Initializer
-- (instancetype)initWithVideoConfig:(MPVideoConfig *)videoConfig nativeVideoAdConfig:(MOPUBNativeVideoAdConfigValues *)nativeVideoAdConfig logEventProperties:(MPAdConfigurationLogEventProperties *)logEventProperties;
+- (instancetype)initWithVideoConfig:(MPVideoConfig *)videoConfig nativeVideoAdConfig:(MOPUBNativeVideoAdConfigValues *)nativeVideoAdConfig;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 

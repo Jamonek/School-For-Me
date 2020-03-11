@@ -15,40 +15,40 @@ import RealmSwift
 import Async
 
 extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
-    func presentSearchView(sender: UIButton) {
+    @objc func presentSearchView(_ sender: UIButton) {
         //self.navigationController!.navigationBarHidden = !self.navigationController!.navigationBarHidden
         //MVTopConstraint.constant = 45
-        self.performSegueWithIdentifier("searchSegue", sender: self)
+        self.performSegue(withIdentifier: "searchSegue", sender: self)
     }
     
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        self.navigationController!.navigationBarHidden = !self.navigationController!.navigationBarHidden
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.navigationController!.isNavigationBarHidden = !self.navigationController!.isNavigationBarHidden
         MVTopConstraint.constant = 0
     }
     
-    func dismissSearch(sender: AnyObject) {
-        if self.searchBar.isFirstResponder() {
+    @objc func dismissSearch(_ sender: AnyObject) {
+        if self.searchBar.isFirstResponder {
             self.resignFirstResponder()
         }
     }
     
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
             return nil
-        } else if annotation.isKindOfClass(SchoolAnnotation) {
-            if let pinView: MKPinAnnotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView {
+        } else if annotation.isKind(of: SchoolAnnotation.self) {
+            if let pinView: MKPinAnnotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") as? MKPinAnnotationView {
                 pinView.annotation = annotation
                 return pinView
             } else {
                 let pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
-                pinView.pinTintColor = UIColor.redColor()
+                pinView.pinTintColor = UIColor.red
                 return pinView
             }
         }
         return nil
     }
     
-    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if mapView.viewWithTag(309) != nil {
             print(mapView.subviews)
             for subView in mapView.subviews {
@@ -60,7 +60,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
 
         let (x, y) = (mapView.bounds.width, mapView.bounds.height)
         let specialView: UIView = UIView(frame: CGRect(x: 0, y: y*0.42, width: x, height: y*0.6))
-        let blurEffect = UIBlurEffect(style: .Light)
+        let blurEffect = UIBlurEffect(style: .light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = specialView.bounds
         specialView.addSubview(blurEffectView)
@@ -75,7 +75,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         let realm = try! Realm()
         let sID = (view.annotation as! SchoolAnnotation).schoolID
         let filter: NSPredicate = NSPredicate(format: "%K = %@", "id", String(sID!))
-        data = realm.objects(School).filter(filter)
+        data = realm.objects(School.self).filter(filter)
         sData = data.map{ $0 } // :<
         
         
@@ -111,7 +111,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         // definitely a better way to do this lol I'll come back to it as well
         schoolNameLabel.frame = CGRect(x: sX*0.22, y: sY * 0.1, width: 15, height: 20)
         schoolNameLabel.sizeToFit()
-        schoolNameLabel.textColor = UIColor.grayColor()
+        schoolNameLabel.textColor = UIColor.gray
         specialView.addSubview(schoolNameLabel)
         
         schoolNameLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.1, width: 15, height: 20)
@@ -120,7 +120,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         
         districtNameLabel.frame = CGRect(x: sX*0.22, y: sY * 0.2, width: 15, height: 20)
         districtNameLabel.sizeToFit()
-        districtNameLabel.textColor = UIColor.grayColor()
+        districtNameLabel.textColor = UIColor.gray
         specialView.addSubview(districtNameLabel)
         
         districtNameLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.2, width: 150, height: 35)
@@ -130,7 +130,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         
         gradesNameLabel.frame = CGRect(x: sX*0.22, y: sY*0.39, width: 15, height: 20)
         gradesNameLabel.sizeToFit()
-        gradesNameLabel.textColor = UIColor.grayColor()
+        gradesNameLabel.textColor = UIColor.gray
         specialView.addSubview(gradesNameLabel)
         
         gradesLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.39, width: 15, height: 20)
@@ -139,7 +139,7 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         
         phoneNumberLabel.frame = CGRect(x: sX*0.22, y: sY*0.48, width: 15, height: 20)
         phoneNumberLabel.sizeToFit()
-        phoneNumberLabel.textColor = UIColor.grayColor()
+        phoneNumberLabel.textColor = UIColor.gray
         specialView.addSubview(phoneNumberLabel)
         
         phoneNumberLabelContent.frame = CGRect(x: sX*0.4, y: sY*0.48, width: 15, height: 20)
@@ -150,9 +150,9 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         
         let seeMoreButton = UIButton()
         seeMoreButton.frame = CGRect(x: sX*0.22, y: sY*0.65, width: 200, height: 20)
-        seeMoreButton.setAttributedTitle(NSAttributedString(string: "Expand", font: UIFont.boldSystemFontOfSize(16), kerning: 1.0, color: UIColor.flatSkyBlueColor()), forState: .Normal)
-        seeMoreButton.backgroundColor = UIColor.clearColor()
-        seeMoreButton.addTarget(self, action: "showDetailTV:", forControlEvents: .TouchUpInside)
+        seeMoreButton.setAttributedTitle(NSAttributedString(string: "Expand", font: UIFont.boldSystemFont(ofSize: 16), kerning: 1.0, color: UIColor.flatSkyBlue()), for: [])
+        seeMoreButton.backgroundColor = UIColor.clear
+        seeMoreButton.addTarget(self, action: #selector(UIViewController.showDetailTV(_:)), for: .touchUpInside)
         specialView.addSubview(seeMoreButton)
         
         
@@ -160,10 +160,10 @@ extension MapVC: MKMapViewDelegate, UISearchBarDelegate {
         mapView.addSubview(specialView)
     }
     
-    func mapView(mapView: MKMapView, didDeselectAnnotationView view: MKAnnotationView) {
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
         for subView in mapView.subviews {
             if subView.tag == 309 {
-                UIView.animateWithDuration(1.0,
+                UIView.animate(withDuration: 1.0,
                     animations: {
                         subView.removeFromSuperview() // So this didn't work how I expected.. I'll come back to it
                 })

@@ -15,57 +15,55 @@ import Async
 
 extension School {
     
-    static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: (result: Bool) -> Void) {
+    @objc static func fetchResults(withCoords coordinate: CLLocationCoordinate2D, andDistance distance: Int = 50, completion: @escaping (_ result: Bool) -> Void) {
         let param: [String: AnyObject] = [
-            "lat": coordinate.latitude,
-            "lng": coordinate.longitude,
-            "distance": distance
+            "lat": coordinate.latitude as AnyObject,
+            "lng": coordinate.longitude as AnyObject,
+            "distance": distance as AnyObject
         ]
         
         if !Reachability.isConnectedToNetwork() {
-            completion(result: false)
+            completion(false)
             print("no connection called")
             return
         }
         
-        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForResource = 5
-        Alamofire.Manager.sharedInstance.session.configuration.timeoutIntervalForRequest = 5
-        Alamofire.Manager.sharedInstance.request(.POST, "https://jamonek.com/api/sfm/geo.php", parameters: param).responseJSON { response in
+        AF.request("https://jamonek.com/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
             print(response.request)
-            if response.result.isFailure {
+            if let error = response.error {
                 print("API Failure")
-                completion(result: false)
+                completion(false)
                 return
             }
             
-            if let JSON: Array = response.result.value as? Array<[String: AnyObject]> {
+            if let JSON: Array = response.value as? Array<[String: AnyObject]> {
                 Async.background {
                     let realm = try! Realm()
                     for dict in JSON {
                         do {
                             try realm.write {
                                 let sch = School.mappedSchool(dict)
-                                realm.add(sch, update: true)
+                                realm.add(sch, update: .all)
                             }
                         } catch {
                             print("Error adding location")
-                            completion(result: false)
+                            completion(false)
                         }
                     }
                 }
-                completion(result: true)
+                completion(true)
                 return
             } else {
                 print("Unable to parse JSON.. possibly no data")
-                completion(result: false)
+                completion(false)
                 return
             }
         }
     }
     
-    static func total() -> Int {
+    @objc static func total() -> Int {
         let realm = try! Realm()
-        let data = realm.objects(School)
+        let data = realm.objects(School.self)
         
         return data.count
     }

@@ -16,6 +16,6 @@ extension String {
 extension NSAttributedString {
     
     convenience init?(string text:String, font:UIFont!, kerning: CGFloat!, color:UIColor!) {
-        self.init(string: text, attributes: [NSKernAttributeName:kerning, NSFontAttributeName:font, NSForegroundColorAttributeName:color])
+        self.init(string: text, attributes: [NSAttributedStringKey.kern:kerning, NSAttributedStringKey.font:font, NSAttributedStringKey.foregroundColor:color])
     }
 }

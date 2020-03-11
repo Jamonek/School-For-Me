@@ -13,7 +13,7 @@ struct Global {
     static var schoolID: Int? // Work around for passing the selected location ID
     static var userCoord: CLLocationCoordinate2D?
     
-    func computeDistance(coordinates: CLLocationCoordinate2D, sCoordinates: CLLocationCoordinate2D) -> Double {
+    func computeDistance(_ coordinates: CLLocationCoordinate2D, sCoordinates: CLLocationCoordinate2D) -> Double {
         // User coordinate
         let uLat: Double = coordinates.latitude
         let uLng: Double = coordinates.longitude
@@ -27,7 +27,7 @@ struct Global {
         let deltaL = (sLng.degreesToRadians - uLng.degreesToRadians)
         let a = sin(deltaP/2) * sin(deltaP/2) + cos(uLat.degreesToRadians) * cos(sLat.degreesToRadians) * sin(deltaL/2) * sin(deltaL/2)
         let c = 2 * atan2(sqrt(a), sqrt(1-a))
-        let d = radius * c
+        var d = radius * c
         
         return d.roundToPlaces(2) // distance in miles rounded to 2 decimal places
     }

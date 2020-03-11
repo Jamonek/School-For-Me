@@ -1,11 +1,14 @@
 //
 //  MPVASTMacroProcessor.h
-//  MoPub
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
+
+extern const NSTimeInterval kMPVASTMacroProcessorUnknownTimeOffset;
 
 @interface MPVASTMacroProcessor : NSObject
 

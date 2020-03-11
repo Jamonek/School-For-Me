@@ -1,9 +1,9 @@
-platform :ios, '11.0'
+platform :ios, '13.0'
 use_frameworks!
 
 target 'School For Me' do
     pod 'RealmSwift'
-    pod 'ChameleonFramework/Swift'
+    pod 'ChameleonFramework', '2.1.0'
     pod 'FontAwesomeKit'
     pod 'AlamofireObjectMapper'
     pod 'ObjectMapper'

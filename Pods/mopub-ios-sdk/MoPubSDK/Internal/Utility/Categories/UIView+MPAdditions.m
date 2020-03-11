@@ -1,6 +1,9 @@
 //
 //  UIView+MPAdditions.m
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "UIView+MPAdditions.h"
@@ -92,6 +95,90 @@
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
+}
+
+@end
+
+@implementation UIView (MPSafeArea)
+
+- (NSLayoutXAxisAnchor *)mp_safeLeadingAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.leadingAnchor;
+    } else {
+        return self.leadingAnchor;
+    }
+}
+
+- (NSLayoutXAxisAnchor *)mp_safeTrailingAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.trailingAnchor;
+    } else {
+        return self.trailingAnchor;
+    }
+}
+
+- (NSLayoutXAxisAnchor *)mp_safeLeftAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.leftAnchor;
+    } else {
+        return self.leftAnchor;
+    }
+}
+
+- (NSLayoutXAxisAnchor *)mp_safeRightAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.rightAnchor;
+    } else {
+        return self.rightAnchor;
+    }
+}
+
+- (NSLayoutYAxisAnchor *)mp_safeTopAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.topAnchor;
+    } else {
+        return self.topAnchor;
+    }
+}
+
+- (NSLayoutYAxisAnchor *)mp_safeBottomAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.bottomAnchor;
+    } else {
+        return self.bottomAnchor;
+    }
+}
+
+- (NSLayoutDimension *)mp_safeWidthAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.widthAnchor;
+    } else {
+        return self.widthAnchor;
+    }
+}
+
+- (NSLayoutDimension *)mp_safeHeightAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.heightAnchor;
+    } else {
+        return self.heightAnchor;
+    }
+}
+
+- (NSLayoutXAxisAnchor *)mp_safeCenterXAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.centerXAnchor;
+    } else {
+        return self.centerXAnchor;
+    }
+}
+
+- (NSLayoutYAxisAnchor *)mp_safeCenterYAnchor {
+    if (@available(iOS 11, *)) {
+        return self.safeAreaLayoutGuide.centerYAnchor;
+    } else {
+        return self.centerYAnchor;
+    }
 }
 
 @end

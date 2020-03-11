@@ -1,39 +1,35 @@
 //
 //  MPInterstitialAdController.m
-//  MoPub
 //
-//  Copyright (c) 2012 MoPub, Inc. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPInterstitialAdController.h"
-
-#import "MPLogging.h"
-#import "MPInstanceProvider.h"
+#import "MoPub+Utility.h"
+#import "MPAdTargeting.h"
+#import "MPGlobal.h"
+#import "MPImpressionTrackedNotification.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
+#import "MPLogging.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
 @property (nonatomic, strong) MPInterstitialAdManager *manager;
 
-+ (NSMutableArray *)sharedInterstitials;
++ (NSMutableDictionary *)sharedInterstitials;
 - (id)initWithAdUnitId:(NSString *)adUnitId;
 
 @end
 
 @implementation MPInterstitialAdController
 
-@synthesize manager = _manager;
-@synthesize delegate = _delegate;
-@synthesize adUnitId = _adUnitId;
-@synthesize keywords = _keywords;
-@synthesize location = _location;
-@synthesize testing = _testing;
-
 - (id)initWithAdUnitId:(NSString *)adUnitId
 {
     if (self = [super init]) {
-        self.manager = [[MPInstanceProvider sharedProvider] buildMPInterstitialAdManagerWithDelegate:self];
+        self.manager = [[MPInterstitialAdManager alloc] initWithDelegate:self];
         self.adUnitId = adUnitId;
     }
     return self;
@@ -48,22 +44,16 @@
 
 + (MPInterstitialAdController *)interstitialAdControllerForAdUnitId:(NSString *)adUnitId
 {
-    NSMutableArray *interstitials = [[self class] sharedInterstitials];
+    NSMutableDictionary *interstitials = [[self class] sharedInterstitials];
 
     @synchronized(self) {
         // Find the correct ad controller based on the ad unit ID.
-        MPInterstitialAdController *interstitial = nil;
-        for (MPInterstitialAdController *currentInterstitial in interstitials) {
-            if ([currentInterstitial.adUnitId isEqualToString:adUnitId]) {
-                interstitial = currentInterstitial;
-                break;
-            }
-        }
+        MPInterstitialAdController * interstitial = interstitials[adUnitId];
 
         // Create a new ad controller for this ad unit ID if one doesn't already exist.
-        if (!interstitial) {
+        if (interstitial == nil) {
             interstitial = [[[self class] alloc] initWithAdUnitId:adUnitId];
-            [interstitials addObject:interstitial];
+            interstitials[adUnitId] = interstitial;
         }
 
         return interstitial;
@@ -77,22 +67,25 @@
 
 - (void)loadAd
 {
-    [self.manager loadInterstitialWithAdUnitID:self.adUnitId
-                                      keywords:self.keywords
-                                      location:self.location
-                                       testing:self.testing];
+    MPAdTargeting * targeting = [MPAdTargeting targetingWithCreativeSafeSize:MPApplicationFrame(YES).size];
+    targeting.keywords = self.keywords;
+    targeting.localExtras = self.localExtras;
+    targeting.location = self.location;
+    targeting.userDataKeywords = self.userDataKeywords;
+
+    [self.manager loadInterstitialWithAdUnitID:self.adUnitId targeting:targeting];
 }
 
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        MPLogWarn(@"The interstitial could not be shown: "
+        MPLogInfo(@"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
 
     if (![controller.view.window isKeyWindow]) {
-        MPLogWarn(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
+        MPLogInfo(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
     }
 
     [self.manager presentInterstitialFromViewController:controller];
@@ -100,13 +93,13 @@
 
 #pragma mark - Internal
 
-+ (NSMutableArray *)sharedInterstitials
++ (NSMutableDictionary *)sharedInterstitials
 {
-    static NSMutableArray *sharedInterstitials;
+    static NSMutableDictionary *sharedInterstitials;
 
     @synchronized(self) {
         if (!sharedInterstitials) {
-            sharedInterstitials = [NSMutableArray array];
+            sharedInterstitials = [NSMutableDictionary dictionary];
         }
     }
 
@@ -135,7 +128,9 @@
 - (void)manager:(MPInterstitialAdManager *)manager
         didFailToLoadInterstitialWithError:(NSError *)error
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidFailToLoadAd:)]) {
+    if ([self.delegate respondsToSelector:@selector(interstitialDidFailToLoadAd:withError:)]) {
+        [self.delegate interstitialDidFailToLoadAd:self withError:error];
+    } else if ([self.delegate respondsToSelector:@selector(interstitialDidFailToLoadAd:)]) {
         [self.delegate interstitialDidFailToLoadAd:self];
     }
 }
@@ -182,14 +177,23 @@
     }
 }
 
+- (void)interstitialAdManager:(MPInterstitialAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData {
+    [MoPub sendImpressionDelegateAndNotificationFromAd:self
+                                              adUnitID:self.adUnitId
+                                        impressionData:impressionData];
+}
+
 + (NSMutableArray *)sharedInterstitialAdControllers
 {
-    return [[self class] sharedInterstitials];
+    return [NSMutableArray arrayWithArray:[[self class] sharedInterstitials].allValues];
 }
 
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller
 {
-    [[[self class] sharedInterstitials] removeObject:controller];
+    @synchronized(self) {
+        NSMutableDictionary * sharedInterstitials = [[self class] sharedInterstitials];
+        [sharedInterstitials removeObjectForKey:controller.adUnitId];
+    }
 }
 
 @end
