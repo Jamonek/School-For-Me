@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // MARK: Register for remote notifications
         let settings: UIUserNotificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-        application.registerUserNotificationSettings(settings)
+        //application.registerUserNotificationSettings(settings)
         application.registerForRemoteNotifications()
         
         FirebaseApp.configure()
@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(self.tokenRefreshNotificaiton), name: NSNotification.Name.InstanceIDTokenRefresh, object: nil)
         
         Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlue(), with: .contrast)
-        Fabric.with([Crashlytics.self, MoPub.self])
+        Fabric.with([Crashlytics.self])
 
         
         // Taken from https://realm.io/docs/swift/latest/#migrations
