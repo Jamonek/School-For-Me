@@ -39,8 +39,8 @@ class FilterVC: UIViewController {
         magnetSwitch.addTarget(self, action: #selector(FilterVC.sendSwitchNotification(_:)), for: .touchUpInside)
         titleSwitch.addTarget(self, action: #selector(FilterVC.sendSwitchNotification(_:)), for: .touchUpInside)
         
-        self.viewDivider1.backgroundColor = UIColor.flatSkyBlue
-        self.viewDivider2.backgroundColor = UIColor.flatSkyBlue
+        self.viewDivider1.backgroundColor = UIColor.flatSkyBlue()
+        self.viewDivider2.backgroundColor = UIColor.flatSkyBlue()
     }
     
     @IBAction func distanceSliderChange(_ sender: UISlider) {

@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Add observer for InstanceID token refresh callback.
         NotificationCenter.default.addObserver(self, selector: #selector(self.tokenRefreshNotificaiton), name: NSNotification.Name.InstanceIDTokenRefresh, object: nil)
         
-        Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlue, with: .contrast)
+        Chameleon.setGlobalThemeUsingPrimaryColor(UIColor.flatSkyBlue(), with: .contrast)
         Fabric.with([Crashlytics.self, MoPub.self])
 
         
@@ -78,19 +78,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @objc func tokenRefreshNotificaiton(_ notification: Notification) {
-        //let refreshedToken = FIRInstanceID.instanceID().token()!
-        connectToFcm()
     }
 
-    @objc func connectToFcm() {
-        Messaging.messaging().connect { (error) in
-            if (error != nil) {
-                print("Unable to connect with FCM. \(error)")
-            } else {
-                print("Connected to FCM.")
-            }
-        }
-    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -100,7 +89,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        Messaging.messaging().disconnect()
         print("Disconnected from FCM.")
     }
 
@@ -110,7 +98,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        connectToFcm()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
