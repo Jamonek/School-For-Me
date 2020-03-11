@@ -23,7 +23,6 @@
 		642DA1091C1E168900419867 /* NSObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA1081C1E168900419867 /* NSObject+Extensions.swift */; };
 		642DA10B1C1E2C3D00419867 /* SchoolAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */; };
 		643C47271C9B99A8009DAC27 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643C47261C9B99A8009DAC27 /* Reachability.swift */; };
-		643C47291C9BD87D009DAC27 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643C47281C9BD87D009DAC27 /* StoreKit.framework */; };
 		646778FB1C3F4A470060ECD6 /* UIViewExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646778FA1C3F4A470060ECD6 /* UIViewExt.swift */; };
 		646A35E61C51ECD3002131AF /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646A35E51C51ECD3002131AF /* SnapshotHelper.swift */; };
 		646F31BD1C41E3EF002B432C /* DetailTV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646F31BC1C41E3EF002B432C /* DetailTV.swift */; };
@@ -79,7 +78,6 @@
 		642DA1081C1E168900419867 /* NSObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+Extensions.swift"; sourceTree = "<group>"; };
 		642DA10A1C1E2C3D00419867 /* SchoolAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchoolAnnotations.swift; sourceTree = "<group>"; };
 		643C47261C9B99A8009DAC27 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
-		643C47281C9BD87D009DAC27 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		646778FA1C3F4A470060ECD6 /* UIViewExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewExt.swift; sourceTree = "<group>"; };
 		646A35E51C51ECD3002131AF /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		646F31BC1C41E3EF002B432C /* DetailTV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailTV.swift; sourceTree = "<group>"; };
@@ -115,7 +113,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				643C47291C9BD87D009DAC27 /* StoreKit.framework in Frameworks */,
 				641CD3B91C442EC70090A18A /* iAd.framework in Frameworks */,
 				64CEC27A1CA3623900817606 /* MapKit.framework in Frameworks */,
 				5867C37B59893C5107A48EC7 /* Pods_School_For_Me.framework in Frameworks */,
@@ -268,7 +265,6 @@
 			isa = PBXGroup;
 			children = (
 				64CEC2791CA3623900817606 /* MapKit.framework */,
-				643C47281C9BD87D009DAC27 /* StoreKit.framework */,
 				641CD3B81C442EC70090A18A /* iAd.framework */,
 				85D0BCDB61AF1F90A39AAE6F /* Pods.framework */,
 				A5399505461BF5F4DBD42EE0 /* Pods_School_For_Me.framework */,
@@ -362,8 +358,8 @@
 				TargetAttributes = {
 					64B8F2581C1515CB005BC4A9 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = W29D5BE398;
 						LastSwiftMigration = 0920;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
 								enabled = 1;
@@ -393,6 +389,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -769,18 +766,21 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W29D5BE398;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "School For Me/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-Me";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
@@ -793,18 +793,21 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = W29D5BE398;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "School For Me/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamonek.School-For-Me";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
