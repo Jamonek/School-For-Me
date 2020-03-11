@@ -1,12 +1,19 @@
 //
 //  UIButton+MPAdditions.h
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <UIKit/UIKit.h>
 
-@interface UIButton (MPAdditions)
+NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic) UIEdgeInsets mp_TouchAreaInsets;
+@interface UIButton (MPVideoPlayer)
+
+- (void)applyMPVideoPlayerBorderedStyleWithTitle:(NSString *)title;
 
 @end
+
+NS_ASSUME_NONNULL_END

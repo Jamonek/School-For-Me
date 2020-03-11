@@ -1,16 +1,19 @@
 //
 //  MOPUBExperimentProvider.h
-//  MoPub
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPAdDestinationDisplayAgent.h"
 
 @interface MOPUBExperimentProvider : NSObject
 
-+ (void)setDisplayAgentType:(MOPUBDisplayAgentType)displayAgentType;
-+ (void)setDisplayAgentFromAdServer:(MOPUBDisplayAgentType)displayAgentType;
-+ (MOPUBDisplayAgentType)displayAgentType;
+@property (nonatomic, assign) MOPUBDisplayAgentType displayAgentType;
+
++ (instancetype)sharedInstance;
+
+- (void)setDisplayAgentFromAdServer:(MOPUBDisplayAgentType)displayAgentType;
 
 @end

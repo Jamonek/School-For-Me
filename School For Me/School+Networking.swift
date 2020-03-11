@@ -28,22 +28,22 @@ extension School {
             return
         }
         
-        Alamofire.request("https://jamonek.com/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
+        AF.request("https://jamonek.com/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
             print(response.request)
-            if response.result.isFailure {
+            if let error = response.error {
                 print("API Failure")
                 completion(false)
                 return
             }
             
-            if let JSON: Array = response.result.value as? Array<[String: AnyObject]> {
+            if let JSON: Array = response.value as? Array<[String: AnyObject]> {
                 Async.background {
                     let realm = try! Realm()
                     for dict in JSON {
                         do {
                             try realm.write {
                                 let sch = School.mappedSchool(dict)
-                                realm.add(sch, update: true)
+                                realm.add(sch, update: .all)
                             }
                         } catch {
                             print("Error adding location")

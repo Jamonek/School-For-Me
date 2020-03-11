@@ -47,7 +47,7 @@ class DetailTV: UITableViewController, MFMailComposeViewControllerDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "detail") as! DetailTVC
-        cell.detailLeftView.backgroundColor = UIColor.flatSkyBlue
+        cell.detailLeftView.backgroundColor = UIColor.flatSkyBlue()
         cell.isUserInteractionEnabled = false
         switch indexPath.row {
         case 0:

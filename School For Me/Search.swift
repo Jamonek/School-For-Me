@@ -138,7 +138,7 @@ class Search: UIViewController, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! SearchCells
-        cell.backgroundColor = UIColor.flatSkyBlue
+        cell.backgroundColor = UIColor.flatSkyBlue()
         cell.schoolName.text = filteredResults[indexPath.row].school_name
         cell.schoolDistrict.text = filteredResults[indexPath.row].district
         let sCoordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: Double(filteredResults[indexPath.row].lat)!, longitude: Double(filteredResults[indexPath.row].lon)!)

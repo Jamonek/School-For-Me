@@ -1,11 +1,14 @@
 //
 //  MPClosableView.h
-//  MoPubSDK
 //
-//  Copyright (c) 2014 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <UIKit/UIKit.h>
+
+extern const CGSize kCloseRegionSize;
 
 enum {
     MPClosableViewCloseButtonLocationTopRight,
@@ -44,7 +47,9 @@ CGRect MPClosableViewCustomCloseButtonFrame(CGSize size, MPClosableViewCloseButt
 @property (nonatomic, readonly) BOOL wasTapped;
 @property (nonatomic, strong, readonly) UIButton *closeButton;
 
-- (instancetype)initWithFrame:(CGRect)frame closeButtonType:(MPClosableViewCloseButtonType)closeButtonType;
+- (instancetype)initWithFrame:(CGRect)frame
+                  contentView:(UIView *)contentView
+                     delegate:(id<MPClosableViewDelegate>)delegate;
 
 @end
 

@@ -1,8 +1,9 @@
 //
 //  MPCoreInstanceProvider.m
-//  MoPub
 //
-//  Copyright (c) 2014 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPCoreInstanceProvider.h"
@@ -10,20 +11,14 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 
-#import "MPAdServerCommunicator.h"
-#import "MPURLResolver.h"
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPReachability.h"
-#import "MPTimer.h"
+#import "MPAdServerCommunicator.h"
 #import "MPAnalyticsTracker.h"
 #import "MPGeolocationProvider.h"
-#import "MPLogEventRecorder.h"
-#import "MPNetworkManager.h"
+#import "MPTimer.h"
+#import "MPURLResolver.h"
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
-
-#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
-#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 static NSString *const kMoPubAppTransportSecurityDictionaryKey = @"NSAppTransportSecurity";
 static NSString *const kMoPubAppTransportSecurityAllowsArbitraryLoadsKey = @"NSAllowsArbitraryLoads";
@@ -41,7 +36,6 @@ typedef enum
 
 @interface MPCoreInstanceProvider ()
 
-@property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, strong) NSMutableDictionary *singletons;
 @property (nonatomic, strong) NSMutableDictionary *carrierInfo;
 @property (nonatomic, assign) MPTwitterDeepLink twitterDeepLinkStatus;
@@ -49,11 +43,6 @@ typedef enum
 @end
 
 @implementation MPCoreInstanceProvider
-
-@synthesize userAgent = _userAgent;
-@synthesize singletons = _singletons;
-@synthesize carrierInfo = _carrierInfo;
-@synthesize twitterDeepLinkStatus = _twitterDeepLinkStatus;
 
 static MPCoreInstanceProvider *sharedProvider = nil;
 
@@ -136,48 +125,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - Fetching Ads
-- (NSMutableURLRequest *)buildConfiguredURLRequestWithURL:(NSURL *)URL
-{
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-    [request setHTTPShouldHandleCookies:YES];
-    [request setValue:self.userAgent forHTTPHeaderField:@"User-Agent"];
-    return request;
-}
-
-- (NSString *)userAgent
-{
-    if (!_userAgent) {
-        self.userAgent = [[[UIWebView alloc] init] stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
-    }
-
-    return _userAgent;
-}
-
-- (MPAdServerCommunicator *)buildMPAdServerCommunicatorWithDelegate:(id<MPAdServerCommunicatorDelegate>)delegate
-{
-    return [(MPAdServerCommunicator *)[MPAdServerCommunicator alloc] initWithDelegate:delegate];
-}
-
-
-#pragma mark - URL Handling
-
-- (MPURLResolver *)buildMPURLResolverWithURL:(NSURL *)URL completion:(MPURLResolverCompletionBlock)completion;
-{
-    return [MPURLResolver resolverWithURL:URL completion:completion];
-}
-
-- (MPAdDestinationDisplayAgent *)buildMPAdDestinationDisplayAgentWithDelegate:(id<MPAdDestinationDisplayAgentDelegate>)delegate
-{
-    return [MPAdDestinationDisplayAgent agentWithDelegate:delegate];
-}
-
 #pragma mark - Utilities
-
-- (UIDevice *)sharedCurrentDevice
-{
-    return [UIDevice currentDevice];
-}
 
 - (MPGeolocationProvider *)sharedMPGeolocationProvider
 {
@@ -216,47 +164,6 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     return gestureRecognizer;
 }
 
-- (NSOperationQueue *)sharedOperationQueue
-{
-    static NSOperationQueue *sharedOperationQueue = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedOperationQueue = [[NSOperationQueue alloc] init];
-    });
-
-    return sharedOperationQueue;
-}
-
-- (MPAnalyticsTracker *)sharedMPAnalyticsTracker
-{
-    return [self singletonForClass:[MPAnalyticsTracker class] provider:^id{
-        return [MPAnalyticsTracker tracker];
-    }];
-}
-
-- (MPReachability *)sharedMPReachability
-{
-    return [self singletonForClass:[MPReachability class] provider:^id{
-        return [MPReachability reachabilityForLocalWiFi];
-    }];
-}
-
-- (MPLogEventRecorder *)sharedLogEventRecorder
-{
-    return [self singletonForClass:[MPLogEventRecorder class] provider:^id{
-        MPLogEventRecorder *recorder = [[MPLogEventRecorder alloc] init];
-        return recorder;
-    }];
-}
-
-- (MPNetworkManager *)sharedNetworkManager
-{
-    return [self singletonForClass:[MPNetworkManager class] provider:^id{
-        return [MPNetworkManager sharedNetworkManager];
-    }];
-}
-
 - (MPATSSetting)appTransportSecuritySettings
 {
     // Keep track of ATS settings statically, as they'll never change in the lifecycle of the application.
@@ -270,14 +177,6 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     }
 
     // Otherwise, figure out ATS settings
-
-    // App Transport Security was introduced in iOS 9; if the system version is less than 9, then arbirtrary loads are fine.
-    if (SYSTEM_VERSION_LESS_THAN(@"9.0")) {
-        gSetting = MPATSSettingAllowsArbitraryLoads;
-        gCheckedAppTransportSettings = YES;
-        return gSetting;
-    }
-
     // Start with the assumption that ATS is enabled
     gSetting = MPATSSettingEnabled;
 
@@ -291,7 +190,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
     // New App Transport Security keys were introduced in iOS 10. Only send settings for these keys if we're running iOS 10 or greater.
     // They may exist in the dictionary if we're running iOS 9, but they won't do anything, so the server shouldn't know about them.
-    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+    if (@available(iOS 10, *)) {
         // In iOS 10, NSAllowsArbitraryLoads gets ignored if ANY keys of NSAllowsArbitraryLoadsForMedia,
         // NSAllowsArbitraryLoadsInWebContent, or NSAllowsLocalNetworking are PRESENT (i.e., they can be set to `false`)
         // See: https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW34
@@ -325,9 +224,33 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     return self.carrierInfo;
 }
 
-- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats
-{
-    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats];
+static CTTelephonyNetworkInfo * gTelephonyNetworkInfo;
+- (MPNetworkStatus)currentRadioAccessTechnology {
+    if (!gTelephonyNetworkInfo) {
+        gTelephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
+    }
+    NSString * accessTechnology = gTelephonyNetworkInfo.currentRadioAccessTechnology;
+
+    // The determination of 2G/3G/4G technology is a best-effort.
+    if ([accessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) { // Source: https://en.wikipedia.org/wiki/LTE_(telecommunication)
+        return MPReachableViaCellularNetwork4G;
+    }
+    else if ([accessTechnology isEqualToString:CTRadioAccessTechnologyCDMAEVDORev0] || // Source: https://www.phonescoop.com/glossary/term.php?gid=151
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyCDMAEVDORevA] || // Source: https://www.phonescoop.com/glossary/term.php?gid=151
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyCDMAEVDORevB] || // Source: https://www.phonescoop.com/glossary/term.php?gid=151
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyWCDMA] || // Source: https://www.techopedia.com/definition/24282/wideband-code-division-multiple-access-wcdma
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyHSDPA] || // Source: https://en.wikipedia.org/wiki/High_Speed_Packet_Access#High_Speed_Downlink_Packet_Access_(HSDPA)
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyHSUPA]) { // Source: https://en.wikipedia.org/wiki/High_Speed_Packet_Access#High_Speed_Uplink_Packet_Access_(HSUPA)
+        return MPReachableViaCellularNetwork3G;
+    }
+    else if ([accessTechnology isEqualToString:CTRadioAccessTechnologyCDMA1x] || // Source: In testing, this mode showed up when the phone was in Verizon 1x mode
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyGPRS] || // Source: https://en.wikipedia.org/wiki/General_Packet_Radio_Service
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyEdge] || // Source: https://en.wikipedia.org/wiki/2G#2.75G_(EDGE)
+             [accessTechnology isEqualToString:CTRadioAccessTechnologyeHRPD]) { // Source: https://www.phonescoop.com/glossary/term.php?gid=155
+        return MPReachableViaCellularNetwork2G;
+    }
+
+    return MPReachableViaCellularNetworkUnknownGeneration;
 }
 
 @end

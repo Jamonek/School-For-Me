@@ -1,49 +1,39 @@
 //
 //  MPVideoConfig.h
-//  MoPub
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
+#import "MPVASTCompanionAd.h"
 #import "MPVASTResponse.h"
 
 @interface MPVideoConfig : NSObject
 
-@property (nonatomic, readonly) NSURL *mediaURL;
+/**
+ Ad response typically contains multiple video files of different resolutions and bit-rates, and the
+ best one is picked when the ad is loaded (not when receiving the ad response).
+ */
+@property (nonatomic, readonly) NSArray<MPVASTMediaFile *> *mediaFiles;
+
 @property (nonatomic, readonly) NSURL *clickThroughURL;
-@property (nonatomic, readonly) NSArray *clickTrackingURLs;
-@property (nonatomic, readonly) NSArray *errorURLs;
-@property (nonatomic, readonly) NSArray *impressionURLs;
-
-/** @name Tracking Events */
-
-@property (nonatomic, readonly) NSArray *creativeViewTrackers;
-@property (nonatomic, readonly) NSArray *startTrackers;
-@property (nonatomic, readonly) NSArray *firstQuartileTrackers;
-@property (nonatomic, readonly) NSArray *midpointTrackers;
-@property (nonatomic, readonly) NSArray *thirdQuartileTrackers;
-@property (nonatomic, readonly) NSArray *completionTrackers;
-@property (nonatomic, readonly) NSArray *muteTrackers;
-@property (nonatomic, readonly) NSArray *unmuteTrackers;
-@property (nonatomic, readonly) NSArray *pauseTrackers;
-@property (nonatomic, readonly) NSArray *rewindTrackers;
-@property (nonatomic, readonly) NSArray *resumeTrackers;
-@property (nonatomic, readonly) NSArray *fullscreenTrackers;
-@property (nonatomic, readonly) NSArray *exitFullscreenTrackers;
-@property (nonatomic, readonly) NSArray *expandTrackers;
-@property (nonatomic, readonly) NSArray *collapseTrackers;
-@property (nonatomic, readonly) NSArray *acceptInvitationLinearTrackers;
-@property (nonatomic, readonly) NSArray *closeLinearTrackers;
-@property (nonatomic, readonly) NSArray *skipTrackers;
-@property (nonatomic, readonly) NSArray *otherProgressTrackers;
-
-/** @name Viewability */
-
-@property (nonatomic, readonly) NSTimeInterval minimumViewabilityTimeInterval;
-@property (nonatomic, readonly) double minimumFractionOfVideoVisible;
-@property (nonatomic, readonly) NSURL *viewabilityTrackingURL;
+@property (nonatomic, readonly) MPVASTDurationOffset *skipOffset;
+@property (nonatomic, readonly) NSString *callToActionButtonTitle;
+@property (nonatomic, readonly) NSString *skipButtonTitle;
+@property (nonatomic, readonly) NSArray<MPVASTIndustryIcon *> *industryIcons;
+@property (nonatomic, assign) BOOL isRewarded; // default is NO
+@property (nonatomic, assign) BOOL enableEarlyClickthroughForNonRewardedVideo; // default is NO
 
 - (instancetype)initWithVASTResponse:(MPVASTResponse *)response additionalTrackers:(NSDictionary *)additionalTrackers;
 
+/**
+ Take a @c MPVideoEvent string for the key, and return an array of @c MPVASTTrackingEvent.
+ */
+- (NSArray<MPVASTTrackingEvent *> *)trackingEventsForKey:(MPVideoEvent)key;
+
+@end
+
+@interface MPVideoConfig (MPVASTCompanionAdProvider) <MPVASTCompanionAdProvider>
 @end

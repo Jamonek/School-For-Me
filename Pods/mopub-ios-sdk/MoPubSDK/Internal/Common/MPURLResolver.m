@@ -1,19 +1,22 @@
 //
 //  MPURLResolver.m
-//  MoPub
 //
-//  Copyright (c) 2013 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#import <StoreKit/StoreKit.h>
 #import <WebKit/WebKit.h>
 #import "MPURLResolver.h"
+#import "MPHTTPNetworkSession.h"
 #import "NSURL+MPAdditions.h"
 #import "NSHTTPURLResponse+MPAdditions.h"
-#import "MPInstanceProvider.h"
 #import "MPLogging.h"
 #import "MPCoreInstanceProvider.h"
 #import "MOPUBExperimentProvider.h"
 #import "NSURL+MPAdditions.h"
+#import "MPURLRequest.h"
 
 static NSString * const kMoPubSafariScheme = @"mopubnativebrowser";
 static NSString * const kMoPubSafariNavigateHost = @"navigate";
@@ -26,13 +29,10 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
 
 @property (nonatomic, strong) NSURL *originalURL;
 @property (nonatomic, strong) NSURL *currentURL;
-@property (nonatomic, strong) NSURLConnection *connection;
-@property (nonatomic, strong) NSMutableData *responseData;
-@property (nonatomic, assign) NSStringEncoding responseEncoding;
+@property (nonatomic, strong) NSURLSessionTask *task;
 @property (nonatomic, copy) MPURLResolverCompletionBlock completion;
 
 - (MPURLActionInfo *)actionInfoFromURL:(NSURL *)URL error:(NSError **)error;
-- (NSString *)storeItemIdentifierForURL:(NSURL *)URL;
 - (BOOL)URLShouldOpenInApplication:(NSURL *)URL;
 - (BOOL)URLIsHTTPOrHTTPS:(NSURL *)URL;
 - (BOOL)URLPointsToAMap:(NSURL *)URL;
@@ -41,12 +41,6 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
 @end
 
 @implementation MPURLResolver
-
-@synthesize originalURL = _originalURL;
-@synthesize currentURL = _currentURL;
-@synthesize connection = _connection;
-@synthesize responseData = _responseData;
-@synthesize completion = _completion;
 
 + (instancetype)resolverWithURL:(NSURL *)URL completion:(MPURLResolverCompletionBlock)completion
 {
@@ -65,7 +59,7 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
 
 - (void)start
 {
-    [self.connection cancel];
+    [self.task cancel];
     self.currentURL = self.originalURL;
 
     NSError *error = nil;
@@ -73,32 +67,73 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
 
     if (info) {
         [self safeInvokeAndNilCompletionBlock:info error:nil];
-    } else if ([self shouldEnableClickthroughExperiment]) {
-        MPURLActionInfo *info = [MPURLActionInfo infoWithURL:self.originalURL webViewBaseURL:self.currentURL];
+    } else if ([self shouldOpenWithInAppWebBrowser]) {
+        info = [MPURLActionInfo infoWithURL:self.originalURL webViewBaseURL:self.currentURL];
         [self safeInvokeAndNilCompletionBlock:info error:nil];
     } else if (error) {
         [self safeInvokeAndNilCompletionBlock:nil error:error];
     } else {
-        NSURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:self.originalURL];
-        self.responseData = [NSMutableData data];
-        self.responseEncoding = NSUTF8StringEncoding;
-        self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
+        MPURLRequest *request = [[MPURLRequest alloc] initWithURL:self.originalURL];
+        self.task = [self httpTaskWithRequest:request];
     }
+}
+
+- (NSURLSessionTask *)httpTaskWithRequest:(MPURLRequest *)request {
+    __weak __typeof__(self) weakSelf = self;
+    NSURLSessionTask * task = [MPHTTPNetworkSession startTaskWithHttpRequest:request responseHandler:^(NSData * _Nonnull data, NSHTTPURLResponse * _Nonnull response) {
+        __typeof__(self) strongSelf = weakSelf;
+
+        // Set the response content type
+        NSStringEncoding responseEncoding = NSUTF8StringEncoding;
+        NSDictionary *headers = [response allHeaderFields];
+        NSString *contentType = [headers objectForKey:kMoPubHTTPHeaderContentType];
+        if (contentType != nil) {
+            responseEncoding = [response stringEncodingFromContentType:contentType];
+        }
+
+        NSString *responseString = [[NSString alloc] initWithData:data encoding:responseEncoding];
+        MPURLActionInfo *info = [MPURLActionInfo infoWithURL:strongSelf.originalURL HTTPResponseString:responseString webViewBaseURL:strongSelf.currentURL];
+        [strongSelf safeInvokeAndNilCompletionBlock:info error:nil];
+
+    } errorHandler:^(NSError * _Nonnull error) {
+        __typeof__(self) strongSelf = weakSelf;
+        [strongSelf safeInvokeAndNilCompletionBlock:nil error:error];
+    } shouldRedirectWithNewRequest:^BOOL(NSURLSessionTask * _Nonnull task, NSURLRequest * _Nonnull newRequest) {
+        __typeof__(self) strongSelf = weakSelf;
+
+        // First, check to see if the redirect URL matches any of our suggested actions.
+        NSError * actionInfoError = nil;
+        MPURLActionInfo * info = [strongSelf actionInfoFromURL:newRequest.URL error:&actionInfoError];
+
+        if (info) {
+            [task cancel];
+            [strongSelf safeInvokeAndNilCompletionBlock:info error:nil];
+            return NO;
+        } else {
+            // The redirected URL didn't match any actions, so we should continue with loading the URL.
+            strongSelf.currentURL = newRequest.URL;
+            return YES;
+        }
+    }];
+
+    return task;
 }
 
 - (void)cancel
 {
-    [self.connection cancel];
-    self.connection = nil;
+    [self.task cancel];
+    self.task = nil;
     self.completion = nil;
 }
 
 - (void)safeInvokeAndNilCompletionBlock:(MPURLActionInfo *)info error:(NSError *)error
 {
-    if (self.completion != nil) {
-        self.completion(info, error);
-        self.completion = nil;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.completion != nil) {
+            self.completion(info, error);
+            self.completion = nil;
+        }
+    });
 }
 
 #pragma mark - Handling Application/StoreKit URLs
@@ -119,8 +154,9 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
         return nil;
     }
 
-    if ([self storeItemIdentifierForURL:URL]) {
-        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL iTunesItemIdentifier:[self storeItemIdentifierForURL:URL] iTunesStoreFallbackURL:URL];
+    NSDictionary * storeKitParameters = [self appStoreProductParametersForURL:URL];
+    if (storeKitParameters != nil) {
+        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL iTunesStoreParameters:storeKitParameters iTunesStoreFallbackURL:URL];
     } else if ([self URLHasDeeplinkPlusScheme:URL]) {
         MPEnhancedDeeplinkRequest *request = [[MPEnhancedDeeplinkRequest alloc] initWithURL:URL];
         if (request) {
@@ -177,28 +213,113 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
     return [URL.host hasSuffix:@"maps.google.com"] || [URL.host hasSuffix:@"maps.apple.com"];
 }
 
+- (BOOL)URLIsAppleScheme:(NSURL *)URL
+{
+    // Definitely not an Apple URL scheme.
+    if (![URL.host hasSuffix:@".apple.com"]) {
+        return NO;
+    }
+
+    // Constant set of supported Apple Store subdomains that will be loaded into
+    // SKStoreProductViewController. This is lazily initialized and limited to the
+    // scope of this method.
+    static NSSet * supportedStoreSubdomains = nil;
+    if (supportedStoreSubdomains == nil) {
+        supportedStoreSubdomains = [NSSet setWithArray:@[@"apps", @"books", @"itunes", @"music"]];
+    }
+
+    // Assumes that the Apple Store sub domains are of the format store-type.apple.com
+    // At this point we are guaranteed at least 3 components from the previous ".apple.com"
+    // check.
+    NSArray * hostComponents = [URL.host componentsSeparatedByString:@"."];
+    NSString * subdomain = hostComponents[0];
+
+    return [supportedStoreSubdomains containsObject:subdomain];
+}
+
 #pragma mark Extracting StoreItem Identifiers
 
-- (NSString *)storeItemIdentifierForURL:(NSURL *)URL
+/**
+ Attempt to parse an Apple store URL into a dictionary of @c SKStoreProductParameter items. This will fast fail
+ if the URL is not a valid Apple store URL scheme.
+ @param URL Apple store URL to attempt to parse.
+ @return A dictionary with at least the required @c SKStoreProductParameterITunesItemIdentifier as an entry; otherwise @c nil
+ */
+- (NSDictionary *)appStoreProductParametersForURL:(NSURL *)URL
 {
-    NSString *itemIdentifier = nil;
-    if ([URL.host hasSuffix:@"itunes.apple.com"]) {
-        NSString *lastPathComponent = [[URL path] lastPathComponent];
+    // Definitely not an Apple URL scheme. Don't bother to parse.
+    if (![self URLIsAppleScheme:URL]) {
+        return nil;
+    }
+
+    // Failed to parse out the URL into its components. Likely to be an invalid URL.
+    NSURLComponents * urlComponents = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES];
+    if (urlComponents == nil) {
+        return nil;
+    }
+
+    // Attempt to parse out the item identifier.
+    NSString * itemIdentifier = ({
+        NSString * lastPathComponent = URL.path.lastPathComponent;
+        NSString * itemIdFromQueryParameter = [URL.mp_queryAsDictionary objectForKey:@"id"];
+        NSString * parsedIdentifier = nil;
+
+        // Old style iTunes item identifiers are prefixed with "id".
+        // Example: https://apps.apple.com/.../id923917775
         if ([lastPathComponent hasPrefix:@"id"]) {
-            itemIdentifier = [lastPathComponent substringFromIndex:2];
-        } else {
-            itemIdentifier = [URL.mp_queryAsDictionary objectForKey:@"id"];
+            parsedIdentifier = [lastPathComponent substringFromIndex:2];
         }
-    } else if ([URL.host hasSuffix:@"phobos.apple.com"]) {
-        itemIdentifier = [URL.mp_queryAsDictionary objectForKey:@"id"];
+        // Look for the item identifier as a query parameter in the URL.
+        // Example: https://itunes.apple.com/...?id=923917775
+        else if (itemIdFromQueryParameter != nil) {
+            parsedIdentifier = itemIdFromQueryParameter;
+        }
+        // Newer style Apple Store identifiers are just the last path component.
+        // Example: https://music.apple.com/.../1451047660
+        else {
+            parsedIdentifier = lastPathComponent;
+        }
+
+        // Check that the parsed item identifier doesn't exist or contains invalid characters.
+        NSCharacterSet * nonIntegers = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+        if (parsedIdentifier.length > 0 && [parsedIdentifier rangeOfCharacterFromSet:nonIntegers].location != NSNotFound) {
+            parsedIdentifier = nil;
+        }
+
+        parsedIdentifier;
+    });
+
+    // Item identifier is a required field. If it doesn't exist, there is no point
+    // in continuing to parse the URL.
+    if (itemIdentifier.length == 0) {
+        return nil;
     }
 
-    NSCharacterSet *nonIntegers = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-    if (itemIdentifier && itemIdentifier.length > 0 && [itemIdentifier rangeOfCharacterFromSet:nonIntegers].location == NSNotFound) {
-        return itemIdentifier;
+    // Attempt parsing for the following StoreKit product keys:
+    // SKStoreProductParameterITunesItemIdentifier      (required)
+    // SKStoreProductParameterProductIdentifier         (not supported)
+    // SKStoreProductParameterAdvertisingPartnerToken   (not supported)
+    // SKStoreProductParameterAffiliateToken            (optional)
+    // SKStoreProductParameterCampaignToken             (optional)
+    // SKStoreProductParameterProviderToken             (not supported)
+    //
+    // Query parameter parsing according to:
+    // https://affiliate.itunes.apple.com/resources/documentation/basic_affiliate_link_guidelines_for_the_phg_network/
+    NSMutableDictionary * parameters = [NSMutableDictionary dictionaryWithCapacity:3];
+    parameters[SKStoreProductParameterITunesItemIdentifier] = itemIdentifier;
+
+    for (NSURLQueryItem * queryParameter in urlComponents.queryItems) {
+        // OPTIONAL: Attempt parsing of SKStoreProductParameterAffiliateToken
+        if ([queryParameter.name isEqualToString:@"at"]) {
+            parameters[SKStoreProductParameterAffiliateToken] = queryParameter.value;
+        }
+        // OPTIONAL: Attempt parsing of SKStoreProductParameterCampaignToken
+        else if ([queryParameter.name isEqualToString:@"ct"]) {
+            parameters[SKStoreProductParameterCampaignToken] = queryParameter.value;
+        }
     }
 
-    return nil;
+    return parameters;
 }
 
 #pragma mark - Identifying URLs to open in Safari
@@ -222,7 +343,7 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
     NSStringEncoding encoding = NSUTF8StringEncoding;
 
     if (![contentType length]) {
-        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
+        MPLogInfo(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
         return encoding;
     }
 
@@ -246,64 +367,19 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
     return encoding;
 }
 
-#pragma mark - <NSURLConnectionDataDelegate>
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    [self.responseData appendData:data];
-}
-
-- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
-{
-    // First, check to see if the redirect URL matches any of our suggested actions.
-    NSError *error = nil;
-    MPURLActionInfo *info = [self actionInfoFromURL:request.URL error:&error];
-
-    if (info) {
-        [connection cancel];
-        [self safeInvokeAndNilCompletionBlock:info error:nil];
-        return nil;
-    } else {
-        // The redirected URL didn't match any actions, so we should continue with loading the URL.
-        self.currentURL = request.URL;
-        return request;
-    }
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-
-    NSDictionary *headers = [httpResponse allHeaderFields];
-    NSString *contentType = [headers objectForKey:kMoPubHTTPHeaderContentType];
-    self.responseEncoding = [httpResponse stringEncodingFromContentType:contentType];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    NSString *responseString = [[NSString alloc] initWithData:self.responseData encoding:self.responseEncoding];
-    MPURLActionInfo *info = [MPURLActionInfo infoWithURL:self.originalURL HTTPResponseString:responseString webViewBaseURL:self.currentURL];
-    [self safeInvokeAndNilCompletionBlock:info error:nil];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    [self safeInvokeAndNilCompletionBlock:nil error:error];
-}
-
-#pragma mark - Check if it's necessary to include a URL in the clickthrough experiment.
+#pragma mark - Check if it's necessary to handle the clickthrough URL outside of a web browser
 // There are two types of clickthrough URL sources: from webviews and from non-web views.
 // The ones from webviews start with (https|http)://ads.mopub.com/m/aclk
-// For webviews, in order for a URL to be included in the clickthrough experiment, redirect URL scheme needs to be http/https.
-
-- (BOOL)shouldEnableClickthroughExperiment
+// For webviews, in order for a URL to be processed in a web browser, the redirect URL scheme needs to be http/https.
+- (BOOL)shouldOpenWithInAppWebBrowser
 {
     if (!self.currentURL) {
         return NO;
     }
 
-    // If redirect URL isn't http/https, do not include it in the clickthrough experiment.
-    if (![self URLIsHTTPOrHTTPS:self.currentURL]) {
+    // If redirect URL isn't http/https, do not open it in a browser. It is likely a deep link
+    // or an Apple Store scheme that will need special parsing.
+    if (![self URLIsHTTPOrHTTPS:self.currentURL] || [self URLIsAppleScheme:self.currentURL]) {
         return NO;
     }
 
@@ -311,18 +387,21 @@ static NSString * const kRedirectURLQueryStringKey = @"r";
     if ([self.currentURL.host isEqualToString:kWebviewClickthroughHost] &&
         [self.currentURL.path isEqualToString:kWebviewClickthroughPath]) {
 
+        // Extract the redirect URL from the clickthrough.
         NSString *redirectURLStr = [self.currentURL mp_queryParameterForKey:kRedirectURLQueryStringKey];
-        if (!redirectURLStr || ![self URLIsHTTPOrHTTPS:[NSURL URLWithString:redirectURLStr]]) {
+        NSURL *redirectUrl = [NSURL URLWithString:redirectURLStr];
+
+        // There is a redirect URL. We need to determine if the redirect also needs additional
+        // handling. In the event that no redirect URL is present, normal processing will occur.
+        if (redirectUrl != nil && (![self URLIsHTTPOrHTTPS:redirectUrl] || [self URLIsAppleScheme:redirectUrl])) {
             return NO;
         }
     }
 
-    // Check experiment variant is in test group.
-    if ([MPAdDestinationDisplayAgent shouldUseSafariViewController] ||
-            [MOPUBExperimentProvider displayAgentType] == MOPUBDisplayAgentTypeNativeSafari) {
-        return YES;
-    }
-    return NO;
+    // ADF-4215: If this trailing return value should be changed, check whether App Store redirection
+    // links will end up showing the App Store UI in app (expected) or escaping the app to open the
+    // native iOS App Store (unexpected).
+    return [MPAdDestinationDisplayAgent shouldDisplayContentInApp];
 }
 
 @end

@@ -40,7 +40,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MPAdViewDelegate {
         
         // VC Title
         self.title = "School For Me"
-        searchView.backgroundColor = UIColor.flatSkyBlue
+        searchView.backgroundColor = UIColor.flatSkyBlue()
         // Search Icon from FAK
         let searchIcon = FAKFontAwesome.searchIcon(withSize: 25).image(with: CGSize(width: 30, height: 30))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: searchIcon, style: .plain, target: self, action: #selector(MapVC.presentSearchView(_:)))

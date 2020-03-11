@@ -1,39 +1,48 @@
 //
 //  MOPUBExperimentProvider.m
-//  MoPubSampleApp
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MOPUBExperimentProvider.h"
 
+@interface MOPUBExperimentProvider ()
+@property (nonatomic, assign) BOOL isDisplayAgentOverriddenByClient;
+@end
+
 @implementation MOPUBExperimentProvider
 
-static BOOL gIsDisplayAgentOverriddenByClient = NO;
-static MOPUBDisplayAgentType gDisplayAgentType = MOPUBDisplayAgentTypeInApp;
+@synthesize displayAgentType = _displayAgentType;
 
-+ (void)setDisplayAgentType:(MOPUBDisplayAgentType)displayAgentType
-{
-    gIsDisplayAgentOverriddenByClient = YES;
-    gDisplayAgentType = displayAgentType;
-}
-
-+ (void)setDisplayAgentFromAdServer:(MOPUBDisplayAgentType)displayAgentType
-{
-    if (!gIsDisplayAgentOverriddenByClient) {
-        gDisplayAgentType = displayAgentType;
+- (instancetype)init {
+    self = [super init];
+    if (self != nil) {
+        _isDisplayAgentOverriddenByClient = NO;
+        _displayAgentType = MOPUBDisplayAgentTypeInApp;
     }
+    return self;
 }
 
-+ (MOPUBDisplayAgentType)displayAgentType
-{
-    return gDisplayAgentType;
++ (instancetype)sharedInstance {
+    static dispatch_once_t once;
+    static id _sharedInstance;
+    dispatch_once(&once, ^{
+        _sharedInstance = [self new];
+    });
+    return _sharedInstance;
 }
 
-// used in test only
-+ (void)setDisplayAgentOverriddenByClientFlag:(BOOL)flag
-{
-    gIsDisplayAgentOverriddenByClient = flag;
+- (void)setDisplayAgentType:(MOPUBDisplayAgentType)displayAgentType {
+    _isDisplayAgentOverriddenByClient = YES;
+    _displayAgentType = displayAgentType;
+}
+
+- (void)setDisplayAgentFromAdServer:(MOPUBDisplayAgentType)displayAgentType {
+    if (!self.isDisplayAgentOverriddenByClient) {
+        _displayAgentType = displayAgentType;
+    }
 }
 
 @end

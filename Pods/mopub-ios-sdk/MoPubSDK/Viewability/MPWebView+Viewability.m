@@ -1,8 +1,9 @@
 //
 //  MPWebView+Viewability.m
-//  MoPubSDK
 //
-//  Copyright © 2016 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPWebView+Viewability.h"
@@ -10,7 +11,6 @@
 
 @interface MPWebView ()
 
-- (UIWebView *)uiWebView;
 - (WKWebView *)wkWebView;
 
 @end
@@ -18,7 +18,7 @@
 @implementation MPWebView (Viewability)
 
 - (UIView *)containedWebView {
-    return self.uiWebView ? self.uiWebView : self.wkWebView;
+    return self.wkWebView;
 }
 
 @end
