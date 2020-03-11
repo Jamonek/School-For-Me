@@ -1,14 +1,12 @@
 //
 //  NSURL+MPAdditions.m
-//  MoPub
 //
-//  Copyright (c) 2013 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "NSURL+MPAdditions.h"
-
-static NSString * const kTelephoneScheme = @"tel";
-static NSString * const kTelephonePromptScheme = @"telprompt";
 
 // Share Constants
 static NSString * const kMoPubShareScheme = @"mopubshare";
@@ -32,7 +30,7 @@ static NSString * const kMoPubRewardedVideoEndedHost = @"rewardedVideoEnded";
         if (keyAndValue.count >= 2 &&
             [[keyAndValue objectAtIndex:0] isEqualToString:key] &&
             [[keyAndValue objectAtIndex:1] length] > 0) {
-            return [[keyAndValue objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            return [[keyAndValue objectAtIndex:1] stringByRemovingPercentEncoding];
         }
     }
     return nil;
@@ -47,7 +45,7 @@ static NSString * const kMoPubRewardedVideoEndedHost = @"rewardedVideoEnded";
         if (keyAndValue.count >= 2 &&
             [[keyAndValue objectAtIndex:0] isEqualToString:key] &&
             [[keyAndValue objectAtIndex:1] length] > 0) {
-            [matchingParameters addObject:[[keyAndValue objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            [matchingParameters addObject:[[keyAndValue objectAtIndex:1] stringByRemovingPercentEncoding]];
         }
     }
     return [NSArray arrayWithArray:matchingParameters];
@@ -62,21 +60,10 @@ static NSString * const kMoPubRewardedVideoEndedHost = @"rewardedVideoEnded";
         if (keyVal.count >= 2) {
             NSString *key = [keyVal objectAtIndex:0];
             NSString *value = [keyVal objectAtIndex:1];
-            [queryDict setObject:[value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-                          forKey:key];
+            [queryDict setObject:[value stringByRemovingPercentEncoding] forKey:key];
         }
     }
     return queryDict;
-}
-
-- (BOOL)mp_hasTelephoneScheme
-{
-    return [[[self scheme] lowercaseString] isEqualToString:kTelephoneScheme];
-}
-
-- (BOOL)mp_hasTelephonePromptScheme
-{
-    return [[[self scheme] lowercaseString] isEqualToString:kTelephonePromptScheme];
 }
 
 - (BOOL)mp_isSafeForLoadingWithoutUserAction

@@ -1,26 +1,64 @@
 //
 //  MPVASTCompanionAd.h
-//  MoPub
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MPVASTModel.h"
+#import "MPVASTResource.h"
+#import "MPVASTTrackingEvent.h"
+
+@class MPVASTCompanionAd;
+
+@protocol MPVASTCompanionAdProvider <NSObject>
+
+- (BOOL)hasCompanionAd;
+
+/**
+ Return that best companion ad that fits into the provided container size.
+ */
+- (MPVASTCompanionAd *)companionAdForContainerSize:(CGSize)containerSize;
+
+@end
 
 @interface MPVASTCompanionAd : MPVASTModel
 
-@property (nonatomic, readonly) CGFloat assetHeight;
-@property (nonatomic, readonly) CGFloat assetWidth;
-@property (nonatomic, copy, readonly) NSURL *clickThroughURL;
-@property (nonatomic, readonly) NSArray *clickTrackingURLs;
-@property (nonatomic, readonly) CGFloat height;
-@property (nonatomic, readonly) NSArray *HTMLResources;
-@property (nonatomic, copy, readonly) NSString *identifier;
-@property (nonatomic, readonly) NSArray *iframeResources;
-@property (nonatomic, readonly) NSArray *staticResources;
-@property (nonatomic, readonly) NSDictionary *trackingEvents;
-@property (nonatomic, readonly) CGFloat width;
+@property (nonatomic, strong, readonly) NSString *identifier; // optional attribute
+@property (nonatomic, readonly) CGFloat width; // point width
+@property (nonatomic, readonly) CGFloat height; // point height
+@property (nonatomic, readonly) CGFloat assetHeight; // optional attribute
+@property (nonatomic, readonly) CGFloat assetWidth; // optional attribute
+
+@property (nonatomic, strong, readonly) NSURL *clickThroughURL;
+@property (nonatomic, strong, readonly) NSArray<NSURL *> *clickTrackingURLs;
+
+/** Per VAST 3.0 spec 2.3.3.7 Tracking Details:
+ The <TrackingEvents> element may contain one or more <Tracking> elements, but the only event
+ available for tracking under each Companion is the creativeView event. The creativeView event
+ tracks whether the Companion creative was viewed. This view does not count as an impression
+ because impressions are only counted for the Ad and the Companion is only one part of the Ad.
+ */
+@property (nonatomic, strong, readonly) NSArray<MPVASTTrackingEvent *> *creativeViewTrackers;
+
+/**
+ Return the best @c MPVASTResource that should be displayed. Per VAST specification
+ (https://developers.mopub.com/dsps/ad-formats/video/):
+    We will prioritize processing companion banners in the following order once we’ve picked the
+    best size: Static, HTML, iframe." Here we pick the "best size" that has the number of pixels
+    closest to the ad container.
+
+ Note: The @c type of the returned @c MPVASTResource is determined and assigned.
+ */
+- (MPVASTResource *)resourceToDisplay;
+
+/**
+ Return best @c MPVASTCompanionAd that should be displayed.
+ */
++ (MPVASTCompanionAd *)bestCompanionAdForCandidates:(NSArray<MPVASTCompanionAd *> *)candidates
+                                      containerSize:(CGSize)containerSize;
 
 @end

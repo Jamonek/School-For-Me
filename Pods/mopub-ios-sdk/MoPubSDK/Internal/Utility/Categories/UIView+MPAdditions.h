@@ -1,6 +1,9 @@
 //
 //  UIView+MPAdditions.h
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//
+//  Copyright 2018-2020 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <UIKit/UIKit.h>
@@ -21,5 +24,23 @@
 
 // convert any UIView to UIImage view. We can apply blur effect on UIImage.
 - (UIImage *)mp_snapshot:(BOOL)usePresentationLayer;
+
+@end
+
+/**
+ This @c MPSafeArea category is for reducing boilerplate code for Safe Area handling.
+ */
+@interface UIView (MPSafeArea)
+
+@property(nonatomic,readonly) NSLayoutXAxisAnchor *mp_safeLeadingAnchor;
+@property(nonatomic,readonly) NSLayoutXAxisAnchor *mp_safeTrailingAnchor;
+@property(nonatomic,readonly) NSLayoutXAxisAnchor *mp_safeLeftAnchor;
+@property(nonatomic,readonly) NSLayoutXAxisAnchor *mp_safeRightAnchor;
+@property(nonatomic,readonly) NSLayoutYAxisAnchor *mp_safeTopAnchor;
+@property(nonatomic,readonly) NSLayoutYAxisAnchor *mp_safeBottomAnchor;
+@property(nonatomic,readonly) NSLayoutDimension *mp_safeWidthAnchor;
+@property(nonatomic,readonly) NSLayoutDimension *mp_safeHeightAnchor;
+@property(nonatomic,readonly) NSLayoutXAxisAnchor *mp_safeCenterXAnchor;
+@property(nonatomic,readonly) NSLayoutYAxisAnchor *mp_safeCenterYAnchor;
 
 @end
