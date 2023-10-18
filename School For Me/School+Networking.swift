@@ -28,7 +28,7 @@ extension School {
             return
         }
         
-        AF.request("https://jamonek.com/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
+        AF.request("https://jamone.org/api/sfm/geo.php", method: .post,  parameters: param).responseJSON { response in
             print(response.request)
             if let error = response.error {
                 print("API Failure")
